@@ -58,7 +58,6 @@ const App = () => {
         if (!token) return;
 
         const response = await axios.get(`${server}api/v1/user/me`, {
-          withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -70,7 +69,6 @@ const App = () => {
           dispatch(userNotExist());
           return;
         }
-
         dispatch(userExist(response.data.user));
       } catch (error) {
         console.log(error);
