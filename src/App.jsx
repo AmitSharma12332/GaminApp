@@ -1,12 +1,5 @@
 import axios from "axios";
-import {
-  lazy,
-  Suspense,
-  useCallback,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
@@ -15,7 +8,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { server } from "./constants/config";
 import { userExist, userNotExist } from "./redux/reducer/userReducer";
 
-// Lazy loading components for better performance
+// Lazy Load Components for Better Performance
 const Loader = lazy(() => import("./components/Loader"));
 const Navbar = lazy(() => import("./components/Navbar"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -31,7 +24,7 @@ const WebsiteManagement = lazy(() => import("./pages/admin/WebsiteManagement"));
 const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const Allrequests = lazy(() => import("./pages/admin/Allrequests"));
 
-// Socket.io connection
+// Initialize Socket.io Connection
 const socket = io(server, { autoConnect: false });
 
 const App = () => {
@@ -41,16 +34,27 @@ const App = () => {
   const [sportsData, setSportsData] = useState([]);
   const sidebarRef = useRef(null);
 
-  const toggleSidebar = useCallback(() => {
-    setShowSideBar((prev) => !prev);
-  }, []);
+  // Toggle Sidebar
+  const toggleSidebar = () => setShowSideBar((prev) => !prev);
 
-  const handleClickOutside = useCallback((event) => {
-    if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
-      setShowSideBar(false);
+  // Close Sidebar on Outside Click
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (sidebarRef.current && !sidebarRef.current.contains(event.target)) {
+        setShowSideBar(false);
+      }
+    };
+
+    if (showsidebar) {
+      document.addEventListener("mousedown", handleClickOutside);
+    } else {
+      document.removeEventListener("mousedown", handleClickOutside);
     }
-  }, []);
 
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showsidebar]);
+
+  // Fetch User Data
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -58,20 +62,20 @@ const App = () => {
         if (!token) return;
 
         const response = await axios.get(`${server}api/v1/user/me`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+          withCredentials: true,
+          headers: { Authorization: `Bearer ${token}` },
         });
+
         if (response.data.user.status === "banned") {
           toast.error("Your account has been banned.", { icon: "⚠️" });
-          // Clear authToken and log out user
           localStorage.removeItem("authToken");
           dispatch(userNotExist());
           return;
         }
+
         dispatch(userExist(response.data.user));
       } catch (error) {
-        console.log(error);
+        console.error("User fetch error:", error);
         dispatch(userNotExist());
       }
     };
@@ -79,126 +83,114 @@ const App = () => {
     fetchUser();
   }, [dispatch]);
 
+  // Handle Real-time Sports Data via Socket.io
   useEffect(() => {
     socket.connect();
-    return () => {
-      socket.disconnect();
-    };
-  }, []);
-
-  useEffect(() => {
     socket.on("sportsData", (data) => {
       setSportsData((prevData) =>
         JSON.stringify(prevData) !== JSON.stringify(data) ? data : prevData
       );
     });
 
-    return () => socket.off("sportsData");
+    return () => {
+      socket.off("sportsData");
+      socket.disconnect();
+    };
   }, []);
 
-  useEffect(() => {
-    if (showsidebar) {
-      document.addEventListener("mousedown", handleClickOutside);
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [showsidebar, handleClickOutside]);
-
-  return loading ? (
-    <Suspense fallback={<Loader />}>
-      <Loader />
-    </Suspense>
-  ) : (
+  return (
     <Router>
       <Suspense fallback={<Loader />}>
-        <Navbar showsidebar={showsidebar} toggleSidebar={toggleSidebar} />
-        {showsidebar && (
-          <div
-            ref={sidebarRef}
-            className="md:col-span-2 lg:hidden fixed top-0 left-0 h-full w-80 bg-[#21252b] overflow-y-auto z-[99] shadow-lg"
-          >
-            <AllGames sportsData={sportsData} />
-          </div>
-        )}
-
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <Dashboard
-                sportsData={sportsData}
-                showsidebar={showsidebar}
-                toggleSidebar={toggleSidebar}
-              />
-            }
-          />
-          <Route
-            path="/match/:eventId"
-            element={<MatchDetails sportsData={sportsData} />}
-          />
-
-          <Route path="/casino" element={<Casino />} />
-          <Route path="/slot" element={<Casino />} />
-          <Route path="/fantasy" element={<Casino />} />
-
-          {/* Public Route: Login */}
-          <Route
-            path="/login"
-            element={
-              <ProtectedRoute isAuthenticated={!user}>
-                <Login />
-              </ProtectedRoute>
-            }
-          />
-
-          {/* Protected Route: Only logged-in users */}
-          <Route
-            path="/profile"
-            element={
-              <ProtectedRoute isAuthenticated={!!user}>
-                <Profile />
-              </ProtectedRoute>
-            }
-          />
-
-          <Route
-            path="/mybets"
-            element={
-              <ProtectedRoute isAuthenticated={!!user}>
-                <MyBets />
-              </ProtectedRoute>
-            }
-          />
-          {/* Admin Protected Route */}
-          <Route
-            path="/admin/*"
-            element={
-              <ProtectedRoute
-                isAuthenticated={!!user}
-                adminOnly={true}
-                admin={user?.role === "admin"}
+        {loading ? (
+          <Loader />
+        ) : (
+          <>
+            <Navbar showsidebar={showsidebar} toggleSidebar={toggleSidebar} />
+            {showsidebar && (
+              <div
+                ref={sidebarRef}
+                className="fixed top-0 left-0 h-full w-80 bg-[#21252b] overflow-y-auto z-[99] shadow-lg"
               >
-                <Layout>
-                  <Routes>
-                    <Route path="/requests" element={<Allrequests />} />
-                    <Route
-                      path="/usermanagement"
-                      element={<UserManagement />}
-                    />
-                    <Route path="/management" element={<WebsiteManagement />} />
-                  </Routes>
-                </Layout>
-              </ProtectedRoute>
-            }
-          />
+                <AllGames sportsData={sportsData} />
+              </div>
+            )}
 
-          {/* 404 Not Found */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+            <Routes>
+              <Route
+                path="/"
+                element={
+                  <Dashboard
+                    sportsData={sportsData}
+                    showsidebar={showsidebar}
+                    toggleSidebar={toggleSidebar}
+                  />
+                }
+              />
+              <Route
+                path="/match/:eventId"
+                element={<MatchDetails sportsData={sportsData} />}
+              />
+
+              <Route path="/casino" element={<Casino />} />
+              <Route path="/slot" element={<Casino />} />
+              <Route path="/fantasy" element={<Casino />} />
+
+              {/* Public Route: Login */}
+              <Route
+                path="/login"
+                element={
+                  <ProtectedRoute isAuthenticated={!user}>
+                    <Login />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Protected Routes: Logged-in Users */}
+              <Route
+                path="/profile"
+                element={
+                  <ProtectedRoute isAuthenticated={!!user}>
+                    <Profile />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/mybets"
+                element={
+                  <ProtectedRoute isAuthenticated={!!user}>
+                    <MyBets />
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* Admin Protected Routes */}
+              <Route
+                path="/admin/*"
+                element={
+                  <ProtectedRoute
+                    isAuthenticated={!!user}
+                    adminOnly
+                    admin={user?.role === "admin"}
+                  >
+                    <Layout>
+                      <Routes>
+                        <Route path="/requests" element={<Allrequests />} />
+                        <Route path="/usermanagement" element={<UserManagement />} />
+                        <Route path="/management" element={<WebsiteManagement />} />
+                      </Routes>
+                    </Layout>
+                  </ProtectedRoute>
+                }
+              />
+
+              {/* 404 Not Found */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+
+            <Toaster position="bottom-center" />
+          </>
+        )}
       </Suspense>
-      <Toaster position="bottom-center" />
     </Router>
   );
 };
