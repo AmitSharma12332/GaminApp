@@ -4,12 +4,12 @@ import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
+import Loader from "./components/Loader";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { server } from "./constants/config";
 import { userExist, userNotExist } from "./redux/reducer/userReducer";
 
 // Lazy Load Components for Better Performance
-const Loader = lazy(() => import("./components/Loader"));
 const Navbar = lazy(() => import("./components/Navbar"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Login = lazy(() => import("./pages/Login"));
@@ -101,7 +101,7 @@ const App = () => {
   return (
     <Router>
       <Suspense fallback={<Loader />}>
-        {loading ? (
+        {!loading ? (
           <Loader />
         ) : (
           <>
@@ -175,8 +175,14 @@ const App = () => {
                     <Layout>
                       <Routes>
                         <Route path="/requests" element={<Allrequests />} />
-                        <Route path="/usermanagement" element={<UserManagement />} />
-                        <Route path="/management" element={<WebsiteManagement />} />
+                        <Route
+                          path="/usermanagement"
+                          element={<UserManagement />}
+                        />
+                        <Route
+                          path="/management"
+                          element={<WebsiteManagement />}
+                        />
                       </Routes>
                     </Layout>
                   </ProtectedRoute>
