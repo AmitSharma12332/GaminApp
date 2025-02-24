@@ -2,14 +2,13 @@
 import axios from "axios";
 import { Menu, Wallet, X } from "lucide-react";
 import { memo, useEffect, useState } from "react";
+import isEqual from "react-fast-compare";
 import { useDispatch, useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
 import { server } from "../constants/config";
 import { userNotExist } from "../redux/reducer/userReducer";
-import isEqual from "react-fast-compare";
 
 const NavbarCompoennt = ({ toggleSidebar, showsidebar }) => {
-
   const { user, loading } = useSelector((state) => state.userReducer);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -17,9 +16,9 @@ const NavbarCompoennt = ({ toggleSidebar, showsidebar }) => {
 
   const navItems = [
     { name: "Home", href: "/" },
-    { name: "Casino", href: "#" },
-    { name: "Slot", href: "#" },
-    { name: "Fantasy", href: "#" },
+    { name: "Casino", href: "/casino" },
+    { name: "Slot", href: "/slot" },
+    { name: "Fantasy", href: "/fantasy" },
     { name: "My Bets", href: "/mybets" },
   ];
 
@@ -27,7 +26,7 @@ const NavbarCompoennt = ({ toggleSidebar, showsidebar }) => {
     const fetchUser = async () => {
       const token = localStorage.getItem("authToken");
       if (!token) return; // Don't call API if no token
-  
+
       try {
         const response = await axios.get(`${server}api/v1/user/me`, {
           withCredentials: true,
@@ -35,23 +34,21 @@ const NavbarCompoennt = ({ toggleSidebar, showsidebar }) => {
             Authorization: `Bearer ${token}`,
           },
         });
-  
+
         setWallet(response?.data.user.amount);
       } catch (error) {
         console.log(error);
         dispatch(userNotExist());
       }
     };
-  
+
     if (user) {
       fetchUser(); // Initial fetch
       const interval = setInterval(fetchUser, 1000); // Call API every 1 second
-  
+
       return () => clearInterval(interval); // Cleanup on component unmount
     }
   }, [user, dispatch]);
-  
-  
 
   const handleLogout = () => {
     localStorage.removeItem("authToken");
@@ -62,6 +59,10 @@ const NavbarCompoennt = ({ toggleSidebar, showsidebar }) => {
   return (
     <nav className="bg-[#1a2027] bg-opacity-70 backdrop-blur-lg  fixed w-full z-[99]">
       <div className="max-w-full mx-auto px-4">
+        <div className="h-8 justify-start items-center  gap-2 md:hidden flex">
+          <img src="/logo.webp" className="h-6 w-6" alt="" />
+          <h1 className="text-yellow-500 font-semibold">SHAKTI EXCHANGE</h1>
+        </div>
         <div className="flex items-center justify-between lg:justify-between h-12">
           <div className="flex items-center gap-3">
             {showsidebar ? (
@@ -70,8 +71,12 @@ const NavbarCompoennt = ({ toggleSidebar, showsidebar }) => {
               <Menu className="lg:hidden flex" onClick={toggleSidebar} />
             )}
             <div className="flex gap-2 justify-center items-center">
-              <img src="/logo.webp" className="h-12 hidden md:flex w-12" alt="" />
-              <h1 className=" capitalize text-orange-400 hidden sm:flex font-semibold text-base md:text-2xl">
+              <img
+                src="/logo.webp"
+                className="h-12 hidden md:flex w-12"
+                alt=""
+              />
+              <h1 className=" capitalize text-yellow-500 hidden md:flex font-semibold text-base md:text-2xl">
                 Shaktiex
               </h1>
             </div>
@@ -145,7 +150,6 @@ const NavbarCompoennt = ({ toggleSidebar, showsidebar }) => {
   );
 };
 
-
 const arePropsEqual = (prevProps, nextProps) => {
   return (
     isEqual(prevProps.toggleSidebar, nextProps.toggleSidebar) &&
@@ -153,9 +157,7 @@ const arePropsEqual = (prevProps, nextProps) => {
   );
 };
 
-
 const Navbar = memo(NavbarCompoennt, arePropsEqual);
 Navbar.displayName = "Navbar";
-
 
 export default Navbar;

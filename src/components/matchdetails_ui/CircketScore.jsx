@@ -1,7 +1,6 @@
 /* eslint-disable react/prop-types */
-
-import { useEffect, useState } from "react";
 import axios from "axios";
+import { useEffect, useState } from "react";
 
 const CricketScore = ({ eventId }) => {
   const [scoreData, setScoreData] = useState(null);

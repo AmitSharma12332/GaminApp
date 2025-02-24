@@ -60,7 +60,7 @@ const GameOdds = ({ liveData, onBetSelect }) => {
 
   // Helper function to arrange runners with draw in middle
   const arrangeRunners = (runners = [], odds = []) => {
-    if (!runners.length || !odds.length) return [];
+    if (!runners?.length || !odds?.length) return [];
     const draw = runners.find((r) => r?.name === "The Draw");
     const teams = runners.filter((r) => r?.name !== "The Draw");
     const arrangedRunners = [

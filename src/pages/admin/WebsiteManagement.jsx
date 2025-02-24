@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import axios from "axios";
 import { ImageIcon, Trash2, Upload } from "lucide-react";
@@ -14,8 +15,6 @@ const WebsiteManagement = () => {
 
   // Fetch images
   const fetchImages = async () => {
-    const token = localStorage.getItem("authToken");
-
     try {
       const response = await axios.get(`${server}api/v1/misc/get-images`, {
         withCredentials: true,
@@ -44,20 +43,18 @@ const WebsiteManagement = () => {
       toast.error("Please select a file and enter a title.");
       return;
     }
-    
-    
+
     setIsUploading(true);
     const formData = new FormData();
     formData.append("image", file);
     formData.append("title", title);
-    const token = localStorage.getItem("authToken");
 
     try {
       await axios.post(`${server}api/v1/misc/add-image`, formData, {
-        headers: { "Content-Type": "multipart/form-data",
+        headers: {
+          "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
-
-         },
+        },
       });
       toast.success("Image uploaded successfully!");
       setFile(null);
@@ -72,8 +69,6 @@ const WebsiteManagement = () => {
 
   // Handle image deletion
   const handleDelete = async (id) => {
-    const token = localStorage.getItem("authToken");
-
     try {
       await axios.delete(`${server}api/v1/misc/dlt-image/${id}`, {
         withCredentials: true,

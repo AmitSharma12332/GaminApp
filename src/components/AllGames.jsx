@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { useEffect, useState } from "react";
-import { ChevronRight, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 
 // Static sports data with live cricket data to be added
@@ -55,7 +55,7 @@ const staticSports = [
   },
 ];
 
-export default function AllGames({ sportsData }) {
+const AllGames = ({ sportsData }) => {
   const [openSport, setOpenSport] = useState(null);
   const [openSeries, setOpenSeries] = useState(null);
   const [cricketGames, setCricketGames] = useState([]);
@@ -217,4 +217,6 @@ export default function AllGames({ sportsData }) {
       </div>
     </div>
   );
-}
+};
+
+export default AllGames;

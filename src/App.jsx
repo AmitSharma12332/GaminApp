@@ -1,4 +1,3 @@
-/* eslint-disable no-unused-vars */
 import axios from "axios";
 import {
   lazy,
@@ -8,7 +7,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Toaster } from "react-hot-toast";
+import toast, { Toaster } from "react-hot-toast";
 import { useDispatch, useSelector } from "react-redux";
 import { Route, BrowserRouter as Router, Routes } from "react-router-dom";
 import { io } from "socket.io-client";
@@ -22,6 +21,7 @@ const Navbar = lazy(() => import("./components/Navbar"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Login = lazy(() => import("./pages/Login"));
 const MyBets = lazy(() => import("./pages/MyBets"));
+const Casino = lazy(() => import("./pages/Casino"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const MatchDetails = lazy(() => import("./pages/MatchDetails"));
 const Profile = lazy(() => import("./pages/Profile"));
@@ -55,12 +55,21 @@ const App = () => {
     const fetchUser = async () => {
       try {
         const token = localStorage.getItem("authToken");
+        if (!token) return;
+
         const response = await axios.get(`${server}api/v1/user/me`, {
           withCredentials: true,
           headers: {
             Authorization: `Bearer ${token}`,
           },
         });
+        if (response.data.user.status === "banned") {
+          toast.error("Your account has been banned.", { icon: "⚠️" });
+          // Clear authToken and log out user
+          localStorage.removeItem("authToken");
+          dispatch(userNotExist());
+          return;
+        }
 
         dispatch(userExist(response.data.user));
       } catch (error) {
@@ -131,6 +140,10 @@ const App = () => {
             path="/match/:eventId"
             element={<MatchDetails sportsData={sportsData} />}
           />
+
+          <Route path="/casino" element={<Casino />} />
+          <Route path="/slot" element={<Casino />} />
+          <Route path="/fantasy" element={<Casino />} />
 
           {/* Public Route: Login */}
           <Route

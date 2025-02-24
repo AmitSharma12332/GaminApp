@@ -1,6 +1,5 @@
 /* eslint-disable react/prop-types */
-
-import { memo, useState, useEffect, useRef, lazy } from "react";
+import { lazy, memo, useEffect, useRef, useState } from "react";
 import isEqual from "react-fast-compare";
 
 const BetSlip = lazy(() => import("../BetSlip"));

@@ -68,7 +68,7 @@ const Login = () => {
         <div className="max-w-md w-full space-y-8">
           <div>
             <h2 className="text-2xl font-semibold text-white mb-8">
-              Sign in to <span className="text-orange-400">Shaktiex!!</span> 
+              Sign in to <span className="text-orange-400">Shaktiex!!</span>
             </h2>
           </div>
 

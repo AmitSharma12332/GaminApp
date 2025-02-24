@@ -1,32 +1,43 @@
 /* eslint-disable react/prop-types */
-/* eslint-disable no-unused-vars */
-"use client";
-
-import { useEffect, useState, useMemo, useCallback } from "react";
-import Bookmaker from "../components/matchdetails_ui/Bookmaker";
-import Fancy from "../components/matchdetails_ui/Fancy";
-import Player from "../components/matchdetails_ui/Player";
-import Other from "../components/matchdetails_ui/Other";
+import axios from "axios";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { useParams } from "react-router-dom";
+import AllGames from "../components/AllGames";
+import BetSlip from "../components/BetSlip";
+import Loader from "../components/Loader";
 import BFancy from "../components/matchdetails_ui/BFancy";
-import OddEven from "../components/matchdetails_ui/OddEven";
+import Bookmaker from "../components/matchdetails_ui/Bookmaker";
+import CricketScore from "../components/matchdetails_ui/CircketScore";
+import Fancy from "../components/matchdetails_ui/Fancy";
 import Line from "../components/matchdetails_ui/Line";
 import MatchOdds from "../components/matchdetails_ui/MatchOdds";
-import axios from "axios";
-import { useParams } from "react-router-dom";
-import Loader from "../components/Loader";
-import BetSlip from "../components/BetSlip";
-import CricketScore from "../components/matchdetails_ui/CircketScore";
+import OddEven from "../components/matchdetails_ui/OddEven";
+import Other from "../components/matchdetails_ui/Other";
+import Player from "../components/matchdetails_ui/Player";
 import { server } from "../constants/config";
-import AllGames from "../components/AllGames";
 
-const AllComponents = ({ data, onBetSelect }) => {
+const AllComponents = ({
+  data,
+  marginAgain,
+  setStake,
+  eventId,
+  stake,
+  onBetSelect,
+}) => {
   return (
     <>
       {Object.entries(data).map(([key, value]) => {
         const Component = tabComponents[key];
         return Component ? (
           <div key={key} className="mb-8">
-            <Component data={value} onBetSelect={onBetSelect} />
+            <Component
+              marginAgain={marginAgain}
+              stake={stake}
+              eventId={eventId}
+              setStake={setStake}
+              data={value}
+              onBetSelect={onBetSelect}
+            />
           </div>
         ) : null;
       })}
@@ -48,11 +59,12 @@ const tabComponents = {
 const MatchDetails = ({ sportsData }) => {
   const [activeTab, setActiveTab] = useState("all");
   const [data, setData] = useState(null);
-  const [bookmakers, setBookmakers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { eventId } = useParams();
   const [selectedBet, setSelectedBet] = useState(null);
+  const [marginAgain, setMarginAgain] = useState(false);
+  const [stake, setStake] = useState(100);
 
   useEffect(() => {
     if (!eventId) {
@@ -70,7 +82,6 @@ const MatchDetails = ({ sportsData }) => {
         if (response.status !== 200) {
           throw new Error(`Error: ${response.status} - ${response.statusText}`);
         }
-        setBookmakers(response.data.getBookmaker);
         setData(response.data);
       } catch (err) {
         console.error("Fetch error:", err);
@@ -85,7 +96,7 @@ const MatchDetails = ({ sportsData }) => {
 
     fetchData();
 
-    const intervalId = setInterval(fetchData, 500);
+    const intervalId = setInterval(fetchData, 1000);
 
     return () => clearInterval(intervalId);
   }, [eventId]);
@@ -95,7 +106,11 @@ const MatchDetails = ({ sportsData }) => {
 
     const categorizeMarkets = (rawData) => {
       const categories = {
-        bookmaker: rawData.getBookmaker.map((market) => ({ ...market, eventDetails: rawData.eventDetail })) || [],
+        bookmaker:
+          rawData.getBookmaker.map((market) => ({
+            ...market,
+            eventDetails: rawData.eventDetail,
+          })) || [],
         fancy: [],
         player: [],
         over: [],
@@ -106,42 +121,53 @@ const MatchDetails = ({ sportsData }) => {
 
       if (rawData.getFancy) {
         rawData.getFancy.forEach((market) => {
-          const marketWithEventDetails = { ...market, eventDetails: rawData.eventDetail }
-          const name = market.market.name.toLowerCase()
+          const marketWithEventDetails = {
+            ...market,
+            eventDetails: rawData.eventDetail,
+          };
+          const name = market.market.name.toLowerCase();
           if (name.includes("only")) {
-            categories.over.push(marketWithEventDetails)
+            categories.over.push(marketWithEventDetails);
           } else if (name.includes("over")) {
-            categories.fancy.push(marketWithEventDetails)
+            categories.fancy.push(marketWithEventDetails);
           } else if (name.includes("total")) {
-            categories.odd_even.push(marketWithEventDetails)
+            categories.odd_even.push(marketWithEventDetails);
           } else if (
             name.includes("innings") ||
             name.includes("top") ||
             name.includes("most") ||
             name.includes("highest")
           ) {
-            categories.line.push(marketWithEventDetails)
-          } else if (name.startsWith("fall of") || name.startsWith("caught") || name.startsWith("match ")) {
-            categories.b_fancy.push(marketWithEventDetails)
+            categories.line.push(marketWithEventDetails);
+          } else if (
+            name.startsWith("fall of") ||
+            name.startsWith("caught") ||
+            name.startsWith("match ")
+          ) {
+            categories.b_fancy.push(marketWithEventDetails);
           } else {
-            categories.player.push(marketWithEventDetails)
+            categories.player.push(marketWithEventDetails);
           }
-        })
+        });
       }
       return Object.fromEntries(
-        Object.entries(categories).filter(([_, value]) => value.length > 0)
+        Object.entries(categories).filter(([value]) => value.length > 0)
       );
     };
 
     return categorizeMarkets(data);
   }, [data]);
 
-  const fancyData = useMemo(() => {
-    return categorizedData?.fancy || [];
-  }, [categorizedData]);
+  const betPlaced = () => {
+    setMarginAgain((prev) => !prev);
+  };
 
   const handleBetSelection = useCallback((bet) => {
     setSelectedBet(bet);
+  }, []);
+
+  const handleStakeChange = useCallback((newStake) => {
+    setStake(newStake);
   }, []);
 
   const activeComponent = useMemo(() => {
@@ -150,6 +176,10 @@ const MatchDetails = ({ sportsData }) => {
     if (activeTab === "all") {
       return (
         <AllComponents
+          marginAgain={marginAgain}
+          stake={stake}
+          eventId={eventId}
+          setStake={handleStakeChange}
           data={categorizedData}
           onBetSelect={handleBetSelection}
         />
@@ -161,11 +191,23 @@ const MatchDetails = ({ sportsData }) => {
 
     return (
       <ActiveComponent
+        marginAgain={marginAgain}
+        stake={stake}
+        eventId={eventId}
+        setStake={handleStakeChange}
         onBetSelect={handleBetSelection}
         data={categorizedData[activeTab]}
       />
     );
-  }, [activeTab, categorizedData, handleBetSelection]);
+  }, [
+    activeTab,
+    marginAgain,
+    handleStakeChange,
+    eventId,
+    categorizedData,
+    handleBetSelection,
+    stake,
+  ]);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -189,31 +231,30 @@ const MatchDetails = ({ sportsData }) => {
         <div className="md:col-span-2 lg:flex hidden bg-[#21252b] overflow-y-auto">
           <AllGames sportsData={sportsData} />
         </div>
-        {/* Main Content */}
 
         <div className="lg:col-span-7 md:col-span-12 rounded-lg p-2 lg:pt-2 lg:overflow-y-auto">
-          {/* Match Score */}
           <div className="p-4 bg-[#262a31] border-dashed border-zinc-700 rounded-lg border">
             <div className="flex flex-col">
-
-            <h1 className="text-2xl font-semibold">
-              {data?.eventDetail?.event.name}
-            </h1>
+              <h1 className="text-2xl font-semibold">
+                {data?.eventDetail?.event.name}
+              </h1>
             </div>
             <div className="flex items-start justify-between flex-col md:flex-row mt-1 text-gray-400">
-              <p>
-              {formatDate(data?.eventDetail?.event.startDate)}
-              </p>
-              <p className=" text-blue-400">
-              {data?.eventDetail?.series.name}
-            </p>
+              <p>{formatDate(data?.eventDetail?.event.startDate)}</p>
+              <p className=" text-blue-400">{data?.eventDetail?.series.name}</p>
             </div>
           </div>
 
           <CricketScore eventId={eventId} />
 
-          {/* Match Odds */}
-          <MatchOdds onBetSelect={handleBetSelection} eventId={eventId} />
+          <MatchOdds
+            stake={stake}
+            marginAgain={marginAgain}
+            setStake={handleStakeChange}
+            onBetSelect={handleBetSelection}
+            eventId={eventId}
+            showBetSlip={true}
+          />
 
           {/* Navigation Tabs */}
           <div className="flex gap-1 lg:gap-2 bg-[#262a31] border-dashed border-zinc-700 overflow-x-auto rounded-lg border p-2">
@@ -249,7 +290,13 @@ const MatchDetails = ({ sportsData }) => {
 
         {/* Bet Slip - Fixed on Right for Large Screens, Moves Below for Small Screens */}
         <div className="md:col-span-3 lg:flex hidden overflow-y-auto">
-          <BetSlip match={selectedBet} onClose={() => setSelectedBet(null)} />
+          <BetSlip
+            betPlaced={betPlaced}
+            eventId={eventId}
+            setStake={handleStakeChange}
+            match={selectedBet}
+            onClose={() => setSelectedBet(null)}
+          />
         </div>
       </div>
     </div>

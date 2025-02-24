@@ -1,7 +1,7 @@
-import { memo, useState, useEffect, useRef, lazy } from "react";
-import PropTypes from "prop-types";
 import isEqual from "lodash/isEqual";
-import BetSlip from "./../BetSlip"
+import PropTypes from "prop-types";
+import { memo, useEffect, useRef, useState } from "react";
+import BetSlip from "./../BetSlip";
 
 const BFancyComponent = ({ data, onBetSelect }) => {
   const [selectedBet, setSelectedBet] = useState(null);

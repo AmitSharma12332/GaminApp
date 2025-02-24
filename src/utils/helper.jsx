@@ -1,53 +1,62 @@
-export const calculateProfitAndLoss = (stake, odds, type, category) => {
+const calculateProfitAndLoss = (stake, odds, type, category) => {
   let profit = 0;
   let loss = 0;
 
   category = category.toLowerCase().trim();
-  type = type.toLowerCase().trim();
+  type = type?.toLowerCase().trim();
+
+  if (!["match odds", "bookmaker", "fancy"].includes(category))
+    return {
+      error: "Invalid category! Must be 'match odds', 'bookmaker', or 'fancy'.",
+    };
+
+  if (!["back", "lay"].includes(type))
+    return { error: "Invalid bet type! Must be 'back' or 'lay'." };
+
+  const isBack = type === "back";
 
   switch (category) {
     case "match odds":
-      if (type === "back") {
-        profit = stake * (odds - 1);
-        loss = stake;
-      } else if (type === "lay") {
-        profit = stake;
-        loss = stake * (odds - 1);
-      } else {
-        return { error: "Invalid bet type! Must be 'back' or 'lay'." };
-      }
+      profit = isBack ? stake * (odds - 1) : stake;
+      loss = isBack ? -stake : -stake * (odds - 1);
       break;
 
     case "bookmaker":
-      if (type === "back") {
-        profit = (odds * stake) / 100;
-        loss = stake;
-      } else if (type === "lay") {
-        profit = stake;
-        loss = (odds * stake) / 100;
-      } else {
-        return { error: "Invalid bet type! Must be 'back' or 'lay'." };
-      }
+      profit = isBack ? (odds * stake) / 100 : stake;
+      loss = isBack ? -stake : -(odds * stake) / 100;
       break;
 
     case "fancy":
-      if (type === "back") {
-        profit = (stake * odds) / 100;
-        loss = stake;
-      } else if (type === "lay") {
-        profit = stake;
-        loss = (stake * odds) / 100;
-      } else {
-        return { error: "Invalid bet type! Must be 'yes' or 'no'." };
-      }
+      profit = isBack ? (stake * odds) / 100 : stake;
+      loss = isBack ? -stake : -(stake * odds) / 100;
       break;
-
-    default:
-      return {
-        error:
-          "Invalid category! Must be 'match odds', 'bookmaker', or 'fancy'.",
-      };
   }
 
   return { profit, loss };
 };
+
+const calculateNewMargin = (margin, selectionId, type, profit, loss) => {
+  const isSameSelection = margin?.selectionId === selectionId;
+  const isBack = type === "back";
+
+  return {
+    newProfit: margin?.profit + (isSameSelection === isBack ? profit : loss),
+    newLoss: margin?.loss + (isSameSelection === isBack ? loss : profit),
+  };
+};
+
+const getFormattedTimestamp = () => {
+  return new Date()
+    .toLocaleString("en-US", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: false,
+    })
+    .replace(",", "");
+};
+
+export { calculateNewMargin, calculateProfitAndLoss, getFormattedTimestamp };
