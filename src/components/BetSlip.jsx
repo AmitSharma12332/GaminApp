@@ -58,7 +58,7 @@ const BetSlip = memo(({ match, onClose, setStake, eventId, betPlaced }) => {
   } = useTransactions(eventId);
 
   // Constants
-  const MIN_BET = 100;
+  const MIN_BET = 0;
   const MAX_BET = 500000;
 
   useEffect(() => {
@@ -111,65 +111,52 @@ const BetSlip = memo(({ match, onClose, setStake, eventId, betPlaced }) => {
     [setStake, user?.amount]
   );
 
-  const validateBet = useCallback(() => {
-    if (!user) return "You need to login first";
-    if (!matchRef.current) return "Please select a bet first";
-    if (betAmount < MIN_BET) return `Minimum bet amount is ${MIN_BET}`;
-    if (betAmount > MAX_BET) return `Maximum bet amount is ${MAX_BET}`;
-    if (betAmount > user.amount) return "Insufficient balance";
-    return null;
-  }, [betAmount, user]);
 
- const placeBet = useCallback(async () => {
-  const validationError = validateBet();
-  if (validationError) {
-    toast.error(validationError);
-    return;
-  }
+  const placeBet = useCallback(async () => {
 
-  const token = localStorage.getItem("authToken");
-  const currentMatch = matchRef.current;
+    const token = localStorage.getItem("authToken");
+    const currentMatch = matchRef.current;
 
-  try {
-    setIsPlacingBet(true);
-    const { data } = await axios.post(
-      `${server}api/v1/bet/place?userId=${user._id}`,
-      {
-        eventId: currentMatch.eventId,
-        selection: currentMatch.selectedTeam,
-        match: `${currentMatch.home_team} vs ${currentMatch.away_team}`,
-        marketId: currentMatch.marketId,
-        selectionId: currentMatch.selectionId,
-        fancyNumber: currentMatch.fancyNumber,
-        stake: betAmount,
-        odds: currentMatch.odds,
-        category: currentMatch.category,
-        type: currentMatch.type,
-      },
-      {
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
+    try {
+      setIsPlacingBet(true);
+      const { data } = await axios.post(
+        `${server}api/v1/bet/place?userId=${user._id}`,
+        {
+          eventId: currentMatch.eventId,
+          selection: currentMatch.selectedTeam,
+          match: `${currentMatch.home_team} vs ${currentMatch.away_team}`,
+          marketId: currentMatch.marketId,
+          selectionId: currentMatch.selectionId,
+          fancyNumber: currentMatch.fancyNumber,
+          stake: betAmount,
+          odds: currentMatch.odds,
+          category: currentMatch.category,
+          type: currentMatch.type,
         },
-      }
-    );
-    if (data.success) {
-      await fetchTransactions();
-      betPlaced();
-      toast.success(data.message);
-      onClose();
-    } else {
-      toast.error(data.message || "Failed to place bet");
-    }
-  } catch (error) {
-    console.error("Bet placement error:", error);
-    toast.error(error.response?.data?.message || "Failed to place bet");
-  } finally {
-    setIsPlacingBet(false);
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
-    
-  }
-}, [betAmount, user, onClose, betPlaced, fetchTransactions, validateBet]);
+      if (data.success) {
+        await fetchTransactions();
+        betPlaced();
+        toast.success(data.message);
+        onClose();
+      } else {
+        toast.error(data.message || "Failed to place bet");
+      }
+    } catch (error) {
+      console.error("Bet placement error:", error);
+      toast.error(error.response?.data?.message || "Failed to place bet");
+    } finally {
+      setIsPlacingBet(false);
+    }
+  }, [betAmount, user, onClose, betPlaced, fetchTransactions]);
+
   const currentMatch = matchRef.current;
 
   if (transactionError) {
