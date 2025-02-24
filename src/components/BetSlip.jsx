@@ -101,14 +101,10 @@ const BetSlip = memo(({ match, onClose, setStake, eventId, betPlaced }) => {
   const handleBetChange = useCallback(
     (value) => {
       const newAmount = Math.max(MIN_BET, Math.min(value, MAX_BET));
-      if (newAmount > user?.amount) {
-        toast.error("Insufficient balance");
-        return;
-      }
       setBetAmount(newAmount);
       setStake(newAmount);
     },
-    [setStake, user?.amount]
+    [setStake]
   );
 
 
