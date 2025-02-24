@@ -25,7 +25,7 @@ const UserManagement = lazy(() => import("./pages/admin/UserManagement"));
 const Allrequests = lazy(() => import("./pages/admin/Allrequests"));
 
 // Initialize Socket.io Connection
-const socket = io(server, { autoConnect: false });
+const socket = io(server, { autoConnect: true });
 
 const App = () => {
   const { user, loading } = useSelector((state) => state.userReducer);
