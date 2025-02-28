@@ -259,6 +259,7 @@ const MatchOdds = ({
   setStake,
   showBetSlip,
   marginAgain,
+  betPlaced
 }) => {
   const [sportsData, setSportsData] = useState([]);
   const [selectedBet, setSelectedBet] = useState(null);
@@ -358,6 +359,15 @@ const MatchOdds = ({
     }
   }, [getMargins, marginAgain]);
 
+
+  useEffect(() => {
+    setSelectedOdd(null)
+    setSelectedBet(null)
+  }, [marginAgain])
+
+
+  
+
   return (
     <div>
       <div className="bg-[#1a2027] mb-2 rounded-lg overflow-hidden w-full">
@@ -410,6 +420,8 @@ const MatchOdds = ({
               match={selectedBet}
               onClose={() => setSelectedBet(null)}
               setStake={setStake}
+              betPlaced={betPlaced}
+           
             />
           ) : (
             <div className="bg-[#1a2027] p-4 rounded-lg text-white text-center">

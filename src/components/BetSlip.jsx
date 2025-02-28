@@ -233,7 +233,10 @@ const BetSlip = memo(({ match, onClose, setStake, eventId, betPlaced }) => {
 
       <div className="flex gap-2">
         <button
-          onClick={onClose}
+          onClick={() => {
+            betPlaced();
+          
+          }}
           className="flex-1 border border-red-500 text-red-500 py-2 rounded-lg font-medium transition duration-300 hover:bg-red-500 hover:text-white disabled:opacity-50"
           disabled={isPlacingBet}
         >

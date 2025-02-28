@@ -1,19 +1,20 @@
-/* eslint-disable react/prop-types */
-import axios from "axios";
-import isEqual from "lodash/isEqual";
-import { ChevronRight } from "lucide-react";
-import PropTypes from "prop-types";
-import { lazy, memo, useCallback, useEffect, useState } from "react";
-import { server } from "../../constants/config";
-import { calculateNewMargin, calculateProfitAndLoss } from "../../utils/helper";
+"use client"
 
-const BetSlip = lazy(() => import("../BetSlip"));
+/* eslint-disable react/prop-types */
+import axios from "axios"
+import isEqual from "lodash/isEqual"
+import { ChevronRight } from "lucide-react"
+import PropTypes from "prop-types"
+import { lazy, memo, useCallback, useEffect, useState } from "react"
+import { server } from "../../constants/config"
+import { calculateNewMargin, calculateProfitAndLoss } from "../../utils/helper"
+
+const BetSlip = lazy(() => import("../BetSlip"))
 
 const OddsBox = ({ odds, value, type, onClick, isSelected }) => {
-  const bgColor = type === "Back" ? "bg-[#00B2FF]" : "bg-[#FF7A7F]";
-  const hoverColor =
-    type === "Back" ? "hover:bg-[#00A1E6]" : "hover:bg-[#FF6B6F]";
-  const selectedColor = type === "Back" ? "bg-[#0077B3]" : "bg-[#FF4D55]";
+  const bgColor = type === "Back" ? "bg-[#00B2FF]" : "bg-[#FF7A7F]"
+  const hoverColor = type === "Back" ? "hover:bg-[#00A1E6]" : "hover:bg-[#FF6B6F]"
+  const selectedColor = type === "Back" ? "bg-[#0077B3]" : "bg-[#FF4D55]"
 
   return (
     <button
@@ -22,82 +23,49 @@ const OddsBox = ({ odds, value, type, onClick, isSelected }) => {
         isSelected ? selectedColor : bgColor
       } ${hoverColor} w-full sm:w-12 lg:min-w-[100px] min-w-[70px] md:w-16 h-10 rounded flex flex-col items-center justify-center transition-colors`}
     >
-      <span className="text-black font-semibold text-sm">
-        {odds?.toFixed(2)}
-      </span>
-      <span className="text-black text-[10px] lg:text-xs">
-        {Math.floor(value)}
-      </span>
+      <span className="text-black font-semibold text-sm">{odds?.toFixed(2)}</span>
+      <span className="text-black text-[10px] lg:text-xs">{Math.floor(value)}</span>
     </button>
-  );
-};
+  )
+}
 
-const TeamRow = ({
-  teamName,
-  backOdds,
-  layOdds,
-  onOddsClick,
-  matchData,
-  stake,
-  selectedOdd,
-  selectionId,
-  margin,
-}) => {
-  const previousMargin =
-    margin?.selectionId === selectionId ? margin?.profit : margin?.loss;
+const TeamRow = ({ teamName, backOdds, layOdds, onOddsClick, matchData, stake, selectedOdd, selectionId, margin }) => {
+  const previousMargin = margin?.selectionId === selectionId ? margin?.profit : margin?.loss
 
-  let newProfit = 0;
-  let newLoss = 0;
-  let profit = 0;
-  let loss = 0;
+  let newProfit = 0
+  let newLoss = 0
+  let profit = 0
+  let loss = 0
 
   if (selectedOdd) {
-    const res = calculateProfitAndLoss(
-      stake,
-      selectedOdd.odds,
-      selectedOdd.type,
-      "bookmaker"
-    );
-    profit = res.profit;
-    loss = res.loss;
+    const res = calculateProfitAndLoss(stake, selectedOdd.odds, selectedOdd.type, "bookmaker")
+    profit = res.profit
+    loss = res.loss
 
-    const data = calculateNewMargin(
-      margin,
-      selectedOdd.selectionId,
-      selectedOdd.type,
-      profit,
-      loss
-    );
+    const data = calculateNewMargin(margin, selectedOdd.selectionId, selectedOdd.type, profit, loss)
 
-    newProfit = data.newProfit;
-    newLoss = data.newLoss;
+    newProfit = data.newProfit
+    newLoss = data.newLoss
   }
 
   // Filter out zero value odds and take only first index
-  const filteredBackOdds = backOdds.filter(([value]) => value > 0).slice(0, 1);
-  const filteredLayOdds = layOdds.filter(([value]) => value > 0).slice(0, 1);
+  const filteredBackOdds = backOdds.filter(([value]) => value > 0).slice(0, 1)
+  const filteredLayOdds = layOdds.filter(([value]) => value > 0).slice(0, 1)
 
   return (
     <div className="flex flex-wrap gap-2 sm:flex-nowrap justify-between items-center py-2 border-b border-[#2A3447]">
       <div className="flex flex-col">
-        <span className="text-white text-sm w-full sm:w-[200px] mb-0 font-semibold sm:mb-0">
-          {teamName}
-        </span>
+        <span className="text-white text-sm w-full sm:w-[200px] mb-0 font-semibold sm:mb-0">{teamName}</span>
         <span className="w-full flex justify-start text-xs items-center sm:w-[200px] mb-0 font-semibold sm:mb-0">
-          {((previousMargin !== null && previousMargin !== undefined) ||
-            selectedOdd) && (
+          {((previousMargin !== null && previousMargin !== undefined) || selectedOdd) && (
             <>
               <span
                 className={`text-xs ${
-                  (margin?.selectionId === selectionId
-                    ? margin?.profit
-                    : margin?.loss) > 0
+                  (margin?.selectionId === selectionId ? margin?.profit : margin?.loss) > 0
                     ? "text-green-500"
-                    : (margin?.selectionId === selectionId
-                        ? margin?.profit
-                        : margin?.loss) < 0
-                    ? "text-red-500"
-                    : "text-gray-400"
+                    : (margin?.selectionId === selectionId ? margin?.profit : margin?.loss) < 0
+                      ? "text-red-500"
+                      : "text-gray-400"
                 }`}
               >
                 {margin
@@ -114,15 +82,11 @@ const TeamRow = ({
                     </span>
                     <span
                       className={`text-xs ${
-                        (margin?.selectionId === selectionId
-                          ? newProfit
-                          : newLoss) > 0
+                        (margin?.selectionId === selectionId ? newProfit : newLoss) > 0
                           ? "text-green-500"
-                          : (margin?.selectionId === selectionId
-                              ? newProfit
-                              : newLoss) < 0
-                          ? "text-red-500"
-                          : "text-gray-400"
+                          : (margin?.selectionId === selectionId ? newProfit : newLoss) < 0
+                            ? "text-red-500"
+                            : "text-gray-400"
                       }`}
                     >
                       {margin?.selectionId === selectionId
@@ -137,23 +101,25 @@ const TeamRow = ({
                     </span>
                     <span
                       className={`text-xs ${
-                        (selectedOdd?.type === "back"
-                          ? selectedOdd?.selectionId === selectionId
-                            ? profit
-                            : loss
-                          : selectedOdd?.selectionId === selectionId
-                          ? loss
-                          : profit) > 0
+                        (
+                          selectedOdd?.type === "back"
+                            ? selectedOdd?.selectionId === selectionId
+                              ? profit
+                              : loss
+                            : selectedOdd?.selectionId === selectionId
+                              ? loss
+                              : profit
+                        ) > 0
                           ? "text-green-500"
                           : (selectedOdd?.type === "back"
-                              ? selectedOdd?.selectionId === selectionId
-                                ? profit
-                                : loss
-                              : selectedOdd?.selectionId === selectionId
-                              ? loss
-                              : profit) < 0
-                          ? "text-red-500"
-                          : "text-gray-400"
+                                ? selectedOdd?.selectionId === selectionId
+                                  ? profit
+                                  : loss
+                                : selectedOdd?.selectionId === selectionId
+                                  ? loss
+                                  : profit) < 0
+                            ? "text-red-500"
+                            : "text-gray-400"
                       }`}
                     >
                       {Math.abs(
@@ -162,8 +128,8 @@ const TeamRow = ({
                             ? profit?.toFixed(0)
                             : loss?.toFixed(0)
                           : selectedOdd?.selectionId === selectionId
-                          ? loss?.toFixed(0)
-                          : profit?.toFixed(0)
+                            ? loss?.toFixed(0)
+                            : profit?.toFixed(0),
                       )}
                     </span>
                   </>
@@ -179,16 +145,7 @@ const TeamRow = ({
               odds={odds}
               value={value}
               type="Back"
-              onClick={() =>
-                onOddsClick(
-                  matchData,
-                  teamName,
-                  "Back",
-                  odds,
-                  value,
-                  selectionId
-                )
-              }
+              onClick={() => onOddsClick(matchData, teamName, "Back", odds, value, selectionId)}
               isSelected={
                 selectedOdd &&
                 selectedOdd.selectionId === selectionId &&
@@ -204,16 +161,7 @@ const TeamRow = ({
               odds={odds}
               value={value}
               type="Lay"
-              onClick={() =>
-                onOddsClick(
-                  matchData,
-                  teamName,
-                  "Lay",
-                  odds,
-                  value,
-                  selectionId
-                )
-              }
+              onClick={() => onOddsClick(matchData, teamName, "Lay", odds, value, selectionId)}
               isSelected={
                 selectedOdd &&
                 selectedOdd.selectionId === selectionId &&
@@ -225,8 +173,8 @@ const TeamRow = ({
         ))}
       </div>
     </div>
-  );
-};
+  )
+}
 
 const BookmakerComponent = ({
   data,
@@ -236,44 +184,37 @@ const BookmakerComponent = ({
   stake,
   showBetSlip = true,
   marginAgain,
+  betPlaced,
 }) => {
-  const [selectedBet, setSelectedBet] = useState(null);
-  const [selectedOdd, setSelectedOdd] = useState(null);
-  const [margin, setMargin] = useState(null);
+  const [selectedBet, setSelectedBet] = useState(null)
+  const [selectedOdd, setSelectedOdd] = useState(null)
+  const [margin, setMargin] = useState(null)
 
   const bookmakerMarket = data.find(
     (market) =>
-      (market.market?.name === "Bookmaker" ||
-        market.market?.name === "Bookmaker 0%Comm") &&
+      (market.market?.name === "Bookmaker" || market.market?.name === "Bookmaker 0%Comm") &&
       Array.isArray(market.odds?.runners) &&
-      market.odds.runners.length > 0
-  );
+      market.odds.runners.length > 0,
+  )
 
   const getMargins = useCallback(
     async (token) => {
       try {
-        const response = await axios.get(
-          `${server}api/v1/bet/margins?eventId=${eventId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
+        const response = await axios.get(`${server}api/v1/bet/margins?eventId=${eventId}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         if (response.data.success) {
-          const marginsData =
-            response.data.margins[bookmakerMarket?.market?.id];
-          setMargin(marginsData);
+          const marginsData = response.data.margins[bookmakerMarket?.market?.id]
+          setMargin(marginsData)
         }
       } catch (error) {
-        console.error(
-          "Error fetching margins:",
-          error.response?.data || error.message
-        );
+        console.error("Error fetching margins:", error.response?.data || error.message)
       }
     },
-    [eventId, bookmakerMarket?.market?.id]
-  );
+    [eventId, bookmakerMarket?.market?.id],
+  )
 
   useEffect(() => {
     const token = localStorage.getItem("authToken");
@@ -282,15 +223,13 @@ const BookmakerComponent = ({
     }
   }, [getMargins, marginAgain]);
 
-  const handleOddsClick = (
-    market,
-    teamName,
-    type,
-    odds,
-    value,
-    selectionId
-  ) => {
-    if (value <= 0) return; // Don't handle clicks for zero value odds
+  useEffect(() => {
+    setSelectedOdd(null)
+    setSelectedBet(null)
+  }, [marginAgain])
+
+  const handleOddsClick = (market, teamName, type, odds, value, selectionId) => {
+    if (value <= 0) return // Don't handle clicks for zero value odds
 
     const betData = {
       home_team: market?.eventDetails?.runners?.[0]?.name || "Unknown",
@@ -309,16 +248,17 @@ const BookmakerComponent = ({
       betType: type,
       odds: odds || 0,
       marketName: market?.market?.name || "Unknown Market",
-    };
+    }
 
-    setSelectedBet(betData);
+    setSelectedBet(betData)
     setSelectedOdd({
       selectionId,
       type: type.toLowerCase(),
       odds,
-    });
-    onBetSelect(betData);
-  };
+    })
+    onBetSelect(betData)
+  }
+
 
   return (
     <div>
@@ -338,13 +278,8 @@ const BookmakerComponent = ({
 
           <div className="py-2 px-4">
             {bookmakerMarket.odds?.runners?.map((runner) => {
-              const backOdds = (runner.back || [])
-                .map((odds) => [odds.price, odds.size])
-                .reverse();
-              const layOdds = (runner.lay || []).map((odds) => [
-                odds.price,
-                odds.size,
-              ]);
+              const backOdds = (runner.back || []).map((odds) => [odds.price, odds.size]).reverse()
+              const layOdds = (runner.lay || []).map((odds) => [odds.price, odds.size])
 
               return (
                 <TeamRow
@@ -359,34 +294,32 @@ const BookmakerComponent = ({
                   selectionId={runner.selectionId}
                   margin={margin}
                 />
-              );
+              )
             })}
           </div>
         </div>
       ) : (
-        <div className="bg-[#1a2027] p-4 rounded-lg text-white text-center">
-          No bookmaker market available
-        </div>
+        <div className="bg-[#1a2027] p-4 rounded-lg text-white text-center">No bookmaker market available</div>
       )}
 
       {showBetSlip && (
-        <div className="lg:hidden mt-2">
+        <div className="lg:hidden my-4">
           {selectedBet ? (
             <BetSlip
-              match={selectedBet}
-              onClose={() => setSelectedBet(null)}
-              setStake={setStake}
+            match={selectedBet}
+            onClose={() => setSelectedBet(null)}
+            setStake={setStake}
+            betPlaced={betPlaced}
+         
             />
           ) : (
-            <div className="bg-[#1a2027] p-4 rounded-lg text-white text-center">
-              Select an odd to place a bet
-            </div>
+            <div className="bg-[#1a2027] p-4 rounded-lg text-white text-center">Select an odd to place a bet</div>
           )}
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
 BookmakerComponent.propTypes = {
   data: PropTypes.array.isRequired,
@@ -395,18 +328,20 @@ BookmakerComponent.propTypes = {
   stake: PropTypes.number,
   setStake: PropTypes.func,
   showBetSlip: PropTypes.bool,
-};
+}
 
 const arePropsEqual = (prevProps, nextProps) => {
   return (
     isEqual(prevProps.data, nextProps.data) &&
     prevProps.onBetSelect === nextProps.onBetSelect &&
     prevProps.stake === nextProps.stake &&
-    prevProps.eventId === nextProps.eventId
-  );
-};
+    prevProps.eventId === nextProps.eventId &&
+    prevProps.marginAgain === nextProps.marginAgain
+  )
+}
 
-const Bookmaker = memo(BookmakerComponent, arePropsEqual);
-Bookmaker.displayName = "Bookmaker";
+const Bookmaker = memo(BookmakerComponent, arePropsEqual)
+Bookmaker.displayName = "Bookmaker"
 
-export default Bookmaker;
+export default Bookmaker
+
