@@ -1,9 +1,9 @@
+/* eslint-disable react/prop-types */
 "use client"
 
-/* eslint-disable react/prop-types */
 import axios from "axios"
 import isEqual from "lodash/isEqual"
-import { ChevronRight } from "lucide-react"
+import { ChevronRight } from 'lucide-react'
 import PropTypes from "prop-types"
 import { lazy, memo, useCallback, useEffect, useState } from "react"
 import { server } from "../../constants/config"
@@ -12,9 +12,15 @@ import { calculateNewMargin, calculateProfitAndLoss } from "../../utils/helper"
 const BetSlip = lazy(() => import("../BetSlip"))
 
 const OddsBox = ({ odds, value, type, onClick, isSelected }) => {
-  const bgColor = type === "Back" ? "bg-[#00B2FF]" : "bg-[#FF7A7F]"
-  const hoverColor = type === "Back" ? "hover:bg-[#00A1E6]" : "hover:bg-[#FF6B6F]"
-  const selectedColor = type === "Back" ? "bg-[#0077B3]" : "bg-[#FF4D55]"
+  const bgColor = type === "Back" 
+    ? "bg-[rgb(var(--back-odd))]" 
+    : "bg-[rgb(var(--lay-odd))]"
+  const hoverColor = type === "Back" 
+    ? "hover:bg-[rgb(var(--back-odd-hover))]" 
+    : "hover:bg-[rgb(var(--lay-odd-hover))]"
+  const selectedColor = type === "Back" 
+    ? "bg-[rgb(var(--back-odd-hover))]" 
+    : "bg-[rgb(var(--lay-odd-hover))]"
 
   return (
     <button
@@ -23,8 +29,12 @@ const OddsBox = ({ odds, value, type, onClick, isSelected }) => {
         isSelected ? selectedColor : bgColor
       } ${hoverColor} w-full sm:w-12 lg:min-w-[100px] min-w-[70px] md:w-16 h-10 rounded flex flex-col items-center justify-center transition-colors`}
     >
-      <span className="text-black font-semibold text-sm">{odds?.toFixed(2)}</span>
-      <span className="text-black text-[10px] lg:text-xs">{Math.floor(value)}</span>
+      <span className="text-[rgb(var(--color-text-primary))] font-semibold text-sm">
+        {odds?.toFixed(2)}
+      </span>
+      <span className="text-[rgb(var(--color-text-primary))] text-[10px] lg:text-xs">
+        {Math.floor(value)}
+      </span>
     </button>
   )
 }
@@ -53,19 +63,21 @@ const TeamRow = ({ teamName, backOdds, layOdds, onOddsClick, matchData, stake, s
   const filteredLayOdds = layOdds.filter(([value]) => value > 0).slice(0, 1)
 
   return (
-    <div className="flex flex-wrap gap-2 sm:flex-nowrap justify-between items-center py-2 border-b border-[#2A3447]">
+    <div className="flex flex-wrap gap-2 py-2 px-4 sm:flex-nowrap justify-between items-center border-b border-[rgb(var(--color-border))]">
       <div className="flex flex-col">
-        <span className="text-white text-sm w-full sm:w-[200px] mb-0 font-semibold sm:mb-0">{teamName}</span>
+        <span className="text-[rgb(var(--color-text-primary))] text-sm w-full sm:w-[200px] mb-0 font-semibold sm:mb-0">
+          {teamName}
+        </span>
         <span className="w-full flex justify-start text-xs items-center sm:w-[200px] mb-0 font-semibold sm:mb-0">
           {((previousMargin !== null && previousMargin !== undefined) || selectedOdd) && (
             <>
               <span
                 className={`text-xs ${
                   (margin?.selectionId === selectionId ? margin?.profit : margin?.loss) > 0
-                    ? "text-green-500"
+                    ? "text-green-600"
                     : (margin?.selectionId === selectionId ? margin?.profit : margin?.loss) < 0
-                      ? "text-red-500"
-                      : "text-gray-400"
+                      ? "text-red-600"
+                      : "text-[rgb(var(--color-text-muted))]"
                 }`}
               >
                 {margin
@@ -77,16 +89,16 @@ const TeamRow = ({ teamName, backOdds, layOdds, onOddsClick, matchData, stake, s
               {selectedOdd &&
                 (margin ? (
                   <>
-                    <span className="text-gray-400 scale-75 text-[4px]">
+                    <span className="text-[rgb(var(--color-text-muted))] scale-75 text-[4px]">
                       <ChevronRight />
                     </span>
                     <span
                       className={`text-xs ${
                         (margin?.selectionId === selectionId ? newProfit : newLoss) > 0
-                          ? "text-green-500"
+                          ? "text-green-600"
                           : (margin?.selectionId === selectionId ? newProfit : newLoss) < 0
-                            ? "text-red-500"
-                            : "text-gray-400"
+                            ? "text-red-600"
+                            : "text-[rgb(var(--color-text-muted))]"
                       }`}
                     >
                       {margin?.selectionId === selectionId
@@ -96,7 +108,7 @@ const TeamRow = ({ teamName, backOdds, layOdds, onOddsClick, matchData, stake, s
                   </>
                 ) : (
                   <>
-                    <span className="text-gray-400 scale-75 text-[4px]">
+                    <span className="text-[rgb(var(--color-text-muted))] scale-75 text-[4px]">
                       <ChevronRight />
                     </span>
                     <span
@@ -110,7 +122,7 @@ const TeamRow = ({ teamName, backOdds, layOdds, onOddsClick, matchData, stake, s
                               ? loss
                               : profit
                         ) > 0
-                          ? "text-green-500"
+                          ? "text-green-600"
                           : (selectedOdd?.type === "back"
                                 ? selectedOdd?.selectionId === selectionId
                                   ? profit
@@ -118,8 +130,8 @@ const TeamRow = ({ teamName, backOdds, layOdds, onOddsClick, matchData, stake, s
                                 : selectedOdd?.selectionId === selectionId
                                   ? loss
                                   : profit) < 0
-                            ? "text-red-500"
-                            : "text-gray-400"
+                            ? "text-red-600"
+                            : "text-[rgb(var(--color-text-muted))]"
                       }`}
                     >
                       {Math.abs(
@@ -138,7 +150,7 @@ const TeamRow = ({ teamName, backOdds, layOdds, onOddsClick, matchData, stake, s
           )}
         </span>
       </div>
-      <div className="grid grid-cols-3 sm:flex gap-1 w-full sm:w-auto">
+      <div className="grid grid-cols-2 sm:flex gap-1 w-full sm:w-auto">
         {filteredBackOdds.map(([odds, value], i) => (
           <div key={`back-${i}`} className="flex flex-col items-center">
             <OddsBox
@@ -221,7 +233,7 @@ const BookmakerComponent = ({
     if (token) {
       getMargins(token);
     }
-  }, [getMargins, marginAgain]);
+  }, [getMargins, marginAgain]); 
 
   useEffect(() => {
     setSelectedOdd(null)
@@ -259,24 +271,23 @@ const BookmakerComponent = ({
     onBetSelect(betData)
   }
 
-
   return (
     <div>
       {bookmakerMarket ? (
-        <div className="bg-[#1a2027] mt-2 mb-2 rounded-lg overflow-hidden">
-          <div className="flex justify-between items-center px-3 py-3 bg-[#2c3847]">
-            <h1 className="text-white font-medium">Bookmaker</h1>
+        <div className="bg-[rgb(var(--color-background))] border border-[rgb(var(--color-border))] mt-2 mb-2 rounded-lg overflow-hidden">
+          <div className="flex justify-between items-center px-3 py-3 bg-[rgb(var(--color-background))] border-b border-[rgb(var(--color-border))]">
+            <h1 className="text-[rgb(var(--color-text-primary))] font-medium">Bookmaker</h1>
             <div className="flex flex-row sm:flex-nowrap items-center gap-1">
-              <span className="text-xs bg-[#00B2FF] sm:text-sm text-center w-[100px] text-black py-1 rounded font-semibold">
+              <span className="text-xs bg-[rgb(var(--back-odd))] sm:text-sm text-center w-[100px] text-[rgb(var(--color-text-primary))] py-1 rounded font-semibold">
                 Back
               </span>
-              <span className="text-xs sm:text-sm bg-[#FF7A7F] w-[100px] text-center text-black py-1 rounded font-semibold">
+              <span className="text-xs sm:text-sm bg-[rgb(var(--lay-odd))] w-[100px] text-center text-[rgb(var(--color-text-primary))] py-1 rounded font-semibold">
                 Lay
               </span>
             </div>
           </div>
 
-          <div className="py-2 px-4">
+          <div className="">
             {bookmakerMarket.odds?.runners?.map((runner) => {
               const backOdds = (runner.back || []).map((odds) => [odds.price, odds.size]).reverse()
               const layOdds = (runner.lay || []).map((odds) => [odds.price, odds.size])
@@ -299,21 +310,23 @@ const BookmakerComponent = ({
           </div>
         </div>
       ) : (
-        <div className="bg-[#1a2027] p-4 rounded-lg text-white text-center">No bookmaker market available</div>
+        <div className="bg-[rgb(var(--color-background))] border border-[rgb(var(--color-border))] p-4 rounded-lg text-[rgb(var(--color-text-primary))] text-center">
+          No bookmaker market available
+        </div>
       )}
 
       {showBetSlip && (
         <div className="lg:hidden my-4">
           {selectedBet ? (
             <BetSlip
-            match={selectedBet}
-            onClose={() => setSelectedBet(null)}
-            setStake={setStake}
-            betPlaced={betPlaced}
-         
+              match={selectedBet}
+              onClose={() => setSelectedBet(null)}
+              setStake={setStake}
+              betPlaced={betPlaced}
             />
           ) : (
-            <div className="bg-[#1a2027] p-4 rounded-lg text-white text-center">Select an odd to place a bet</div>
+           <>
+           </>
           )}
         </div>
       )}
@@ -344,4 +357,3 @@ const Bookmaker = memo(BookmakerComponent, arePropsEqual)
 Bookmaker.displayName = "Bookmaker"
 
 export default Bookmaker
-

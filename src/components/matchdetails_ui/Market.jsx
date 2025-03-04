@@ -1,13 +1,14 @@
+/* eslint-disable react/prop-types */
 "use client"
 
-/* eslint-disable react/prop-types */
 import { lazy, memo, useEffect, useRef, useState } from "react"
 import isEqual from "react-fast-compare"
 
 const BetSlip = lazy(() => import("../BetSlip"))
 
-const PlayerComponent = ({ data, onBetSelect }) => {
+const MarketComponent = ({ data, onBetSelect, title="Market", betPlaced, setStake }) => {
   const [selectedBet, setSelectedBet] = useState(null)
+
   const prevDataRef = useRef()
 
   useEffect(() => {
@@ -20,7 +21,6 @@ const PlayerComponent = ({ data, onBetSelect }) => {
           ),
       )
       if (newlySuspended.length > 0) {
-        // Update the lastUpdated field for newly suspended markets
         newlySuspended.forEach((market) => {
           market.lastUpdated = new Date().toISOString()
         })
@@ -48,15 +48,17 @@ const PlayerComponent = ({ data, onBetSelect }) => {
       size: size,
     }
     setSelectedBet(betData)
+    
     onBetSelect(betData)
   }
+
 
   const renderOddsBox = (odds, market, type) => {
     if (!odds) {
       return (
         <div
           className={`w-full sm:w-12 lg:min-w-[100px] min-w-[70px] md:w-16 h-10 ${
-            type === "Back" ? "bg-[rgb(var(--back-odd-disabled))]" : "bg-[rgb(var(--lay-odd-disabled))]"
+            type === "Back" ? "bg-[rgb(var(--back-odd))]" : "bg-[rgb(var(--lay-odd))]"
           } rounded flex items-center justify-center`}
         >
           <span className="text-[rgb(var(--color-text-muted))] text-xs">-</span>
@@ -71,21 +73,25 @@ const PlayerComponent = ({ data, onBetSelect }) => {
           type === "Back"
             ? isActive
               ? "bg-[rgb(var(--back-odd))] hover:bg-[rgb(var(--back-odd-hover))]"
-              : "bg-[rgb(var(--back-odd-disabled))]"
+              : "bg-[#00b3ff36]"
             : isActive
-              ? "bg-[rgb(var(--lay-odd))] hover:bg-[rgb(var(--lay-odd-hover))]"
-              : "bg-[rgb(var(--lay-odd-disabled))]"
+            ? "bg-[rgb(var(--lay-odd))] hover:bg-[rgb(var(--lay-odd-hover))]"
+            : "bg-[#ff7a7e42]"
         } rounded flex flex-col items-center justify-center transition-colors`}
-        onClick={() => isActive && handleOddsClick(market, odds, type, odds.price, odds.size)}
+        onClick={() =>
+          isActive && handleOddsClick(market, odds, type, odds.price, odds.size)
+        }
         disabled={!isActive}
       >
         {isActive ? (
           <>
-            <span className="text-[rgb(var(--color-text-primary))] text-sm font-semibold">{odds.price.toFixed(2)}</span>
-            <span className="text-[rgb(var(--color-text-primary))] text-xs">{Math.floor(odds.size)}</span>
+            <span className="text-black text-sm font-semibold">
+              {odds.price.toFixed(2)}
+            </span>
+            <span className="text-black text-xs">{Math.floor(odds.size)}</span>
           </>
         ) : (
-          <span className="text-red-600 font-semibold text-xs">Suspended</span>
+          <span className="text-red-500 font-semibold text-xs">Suspended</span>
         )}
       </button>
     )
@@ -100,13 +106,13 @@ const PlayerComponent = ({ data, onBetSelect }) => {
   }
 
   if (!Array.isArray(data)) {
-    return <div className="text-[rgb(var(--color-text-primary))]">No player data available</div>
+    return <div className="text-[rgb(var(--color-text-primary))]">No {title.toLowerCase()} data available</div>
   }
 
   return (
     <div className="space-y-0 bg-[rgb(var(--color-background))] border border-[rgb(var(--color-border))] rounded-lg overflow-hidden mt-2">
       <div className="flex flex-row sm:flex-nowrap justify-between items-center p-3 bg-[rgb(var(--color-background))] border-b border-[rgb(var(--color-border))]">
-        <h3 className="text-[rgb(var(--color-text-primary))] font-medium w-full sm:w-auto mb-2 sm:mb-0">Player</h3>
+        <h3 className="text-[rgb(var(--color-text-primary))] font-medium w-full sm:w-auto mb-2 sm:mb-0">{title}</h3>
         <div className="flex flex-row sm:flex-nowrap items-center gap-2 w-full sm:w-auto justify-end sm:justify-end">
           <span className="text-xs sm:text-sm bg-[rgb(var(--lay-odd))] w-full text-center max-w-[70px] lg:min-w-[100px] sm:w-20 text-[rgb(var(--color-text-primary))] py-1 rounded font-semibold">
             No
@@ -131,8 +137,17 @@ const PlayerComponent = ({ data, onBetSelect }) => {
               </div>
             </div>
             {selectedBet && selectedBet.marketId === market.market.id && (
-              <div className="lg:hidden mt-2">
-                <BetSlip match={selectedBet} onClose={() => setSelectedBet(null)} />
+              <div className="fixed lg:hidden p-2 inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                <div className="bg-white rounded-lg shadow-lg w-full max-w-md">
+                  <BetSlip
+                    match={selectedBet}
+                    onClose={() => {
+                      setSelectedBet(null);
+                    }}
+                    setStake={setStake}
+                    betPlaced={betPlaced}
+                  />
+                </div>
               </div>
             )}
           </div>
@@ -143,11 +158,16 @@ const PlayerComponent = ({ data, onBetSelect }) => {
 }
 
 const arePropsEqual = (prevProps, nextProps) => {
-  return isEqual(prevProps.data, nextProps.data) && prevProps.onBetSelect === nextProps.onBetSelect
+  return (
+    isEqual(prevProps.data, nextProps.data) &&
+    prevProps.onBetSelect === nextProps.onBetSelect &&
+    prevProps.title === nextProps.title &&
+    prevProps.type === nextProps.type
+  )
 }
 
-const Player = memo(PlayerComponent, arePropsEqual)
-Player.displayName = "Player"
+const Market = memo(MarketComponent, arePropsEqual)
+Market.displayName = "Market"
 
-export default Player
+export default Market
 

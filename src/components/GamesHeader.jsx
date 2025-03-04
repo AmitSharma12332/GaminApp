@@ -23,14 +23,14 @@ const GamesHeader = ({ activeTab, setActiveTab }) => {
   ];
 
   return (
-    <div className="h-fit w-full border overflow-x-auto bg-[#242a31] border-zinc-700 border-dashed rounded-lg p-2 flex items-center">
+    <div className="h-fit w-full border overflow-x-auto border-[rgb(var(--color-border))] border rounded-lg p-2 flex items-center">
       {sports.map((sport) => (
         <div
           key={sport.key}
           className={`flex items-center justify-center cursor-pointer px-4 py-1 gap-2.5 ${
             activeTab === sport.key
-              ? " bg-blue-500 text-white rounded-md"
-              : "text-gray-400"
+              ? " bg-[rgb(var(--color-primary))] text-white rounded-md"
+              : "text-gray-900"
           }`}
           onClick={() => setActiveTab(sport.key)}
         >

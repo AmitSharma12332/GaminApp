@@ -1,5 +1,5 @@
 /* eslint-disable react/prop-types */
-import { lazy, useEffect, useRef, useState } from "react";
+import { lazy, useCallback, useEffect, useRef, useState } from "react";
 import Footer from "../components/Footer";
 
 const AllGames = lazy(() => import("./../components/AllGames"));
@@ -19,9 +19,13 @@ const Dashboard = ({ showsidebar, toggleSidebar, sportsData }) => {
     setSelectedBet(betData);
   };
 
-  const handleCloseBetSlip = () => {
-    setSelectedBet(null);
-  };
+
+    const betPlaced = useCallback(() => {
+      setSelectedBet(null);
+    }, []);
+
+
+
 
   // Function to handle clicks outside of sidebar
   useEffect(() => {
@@ -46,7 +50,7 @@ const Dashboard = ({ showsidebar, toggleSidebar, sportsData }) => {
     switch (activeTab) {
       case "cricket":
         return (
-          <Cricket liveData={sportsData} onBetSelect={handleBetSelection} />
+          <Cricket betPlaced={betPlaced} liveData={sportsData} onBetSelect={handleBetSelection} />
         );
       case "football":
         return (
@@ -84,10 +88,10 @@ const Dashboard = ({ showsidebar, toggleSidebar, sportsData }) => {
 
   return (
     <>
-      <div className="bg-[#21252b] pt-28 px-2 md:pt-12">
+      <div className=" px-2 ">
         <div className="max-w-full grid grid-cols-1 md:grid-cols-12 lg:h-[calc(100vh-48px)]">
           {/* Sidebar */}
-          <div className="md:col-span-2 lg:flex hidden bg-[#21252b] overflow-y-auto">
+          <div className="md:col-span-2 lg:flex hidden  overflow-y-auto">
             <AllGames sportsData={sportsData} />
           </div>
 
@@ -101,7 +105,7 @@ const Dashboard = ({ showsidebar, toggleSidebar, sportsData }) => {
 
           {/* Right Sidebar */}
           <div className="md:col-span-3 lg:flex hidden overflow-y-auto">
-            <BetSlip match={selectedBet} onClose={handleCloseBetSlip} />
+            <BetSlip match={selectedBet} betPlaced={betPlaced}  onClose={() => setSelectedBet(null)} />
           </div>
         </div>
       </div>

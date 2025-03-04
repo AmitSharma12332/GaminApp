@@ -11,32 +11,31 @@ import BetSlip from "../BetSlip";
 const socket = io(server);
 
 const OddsBox = ({ odds, value, type, onClick, isSelected }) => {
-  const bgColor = type === "back" ? "bg-[#00B2FF]" : "bg-[#FF7A7F]";
-  const hoverColor =
-    type === "back" ? "hover:bg-[#00A1E6]" : "hover:bg-[#FF6B6F]";
-  const selectedColor = type === "back" ? "bg-[#0077B3]" : "bg-[#FF4D55]";
+  const bgColor = type === "back" ? "bg-[rgb(var(--back-odd))]" : "bg-[rgb(var(--lay-odd))]"
+
+  const hoverColor = type === "back" ? "hover:bg-[rgb(var(--back-odd-hover))]" : "hover:bg-[rgb(var(--lay-odd-hover))]"
+
+  const selectedColor = type === "back" ? "bg-[#0077B3]" : "bg-[#FF4D55]"
 
   return (
     <button
       onClick={onClick}
       className={`${
         isSelected ? selectedColor : bgColor
-      } ${hoverColor} w-full sm:w-12 min-w-[60px] md:w-16 rounded flex flex-col items-center justify-center transition-colors p-1`}
+      } ${hoverColor} w-full sm:w-12 min-w-[70px] md:w-16 rounded flex flex-col items-center justify-center transition-colors p-1`}
     >
-      <span className="text-black font-semibold text-sm sm:text-base">
-        {odds}
-      </span>
+      <span className="text-black font-semibold text-sm sm:text-base">{odds}</span>
       <span className="text-black text-[10px] lg:text-xs">{value / 1000}K</span>
     </button>
-  );
-};
+  )
+}
 
 OddsBox.propTypes = {
   odds: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
   type: PropTypes.oneOf(["back", "lay"]).isRequired,
   onClick: PropTypes.func.isRequired,
-  isSelected: PropTypes.bool.isRequired,
+  isSelected: PropTypes.bool,
 };
 
 const TeamRow = ({
@@ -49,6 +48,7 @@ const TeamRow = ({
   selectedOdd,
   selectionId,
   margin,
+  // cashoutData
 }) => {
   const previousMargin =
     margin?.selectionId === selectionId ? margin?.profit : margin?.loss;
@@ -82,11 +82,23 @@ const TeamRow = ({
   }
 
   return (
-    <div className="flex flex-wrap gap-2 sm:flex-nowrap justify-between items-center py-2 border-b border-[#2A3447]">
+    <div className="flex flex-wrap gap-2 border-b px-4 sm:flex-nowrap justify-between items-center py-2 border-[rgb(var(--color-border))]">
       <div className="flex flex-col">
-        <span className="text-white text-sm w-full sm:w-[200px] mb-0 font-semibold sm:mb-0">
+        <span className="text-black text-sm w-full sm:w-[200px] mb-0 font-semibold sm:mb-0">
           {teamName}
         </span>
+
+        {/* {cashoutData && cashoutData.selectionId === selectionId && (
+          <div className="flex flex-col items-center bg-green-100 p-1 rounded">
+            <span className="text-xs font-semibold">Optimal Cashout</span>
+            <span className="text-black font-bold">{cashoutData.stake}</span>
+            <span className="text-xs text-gray-700">
+              {cashoutData.type.charAt(0).toUpperCase() + cashoutData.type.slice(1)} @ {cashoutData.odds}
+            </span>
+          </div>
+        )} */}
+
+        
         <span className="w-full flex justify-start text-xs items-center sm:w-[200px] mb-0 font-semibold sm:mb-0">
           {((previousMargin !== null && previousMargin !== undefined) ||
             selectedOdd) && (
@@ -264,6 +276,8 @@ const MatchOdds = ({
   const [sportsData, setSportsData] = useState([]);
   const [selectedBet, setSelectedBet] = useState(null);
   const [selectedOdd, setSelectedOdd] = useState(null);
+  // const [cashoutData, setCashoutData] = useState(null)
+
   const [margin, setMargin] = useState(null);
   const matches = sportsData?.[4]?.[4] || [];
   const matchData = matches.find((match) => match.event?.event?.id === eventId);
@@ -366,71 +380,147 @@ const MatchOdds = ({
   }, [marginAgain])
 
 
-  
+  // const calculateCashout = useCallback(() => {
+  //   if (!matchData || !margin) return
+
+  //   // Get all available odds from all runners
+  //   const allOdds = []
+  //   runnersWithOdds.forEach((runner) => {
+  //     // Add back odds with selection ID and type
+  //     runner.back.forEach((odds) => {
+  //       allOdds.push({
+  //         selectionId: runner.selectionId,
+  //         odds: odds.price,
+  //         type: "back",
+  //         name: runner.name,
+  //       })
+  //     })
+
+  //     // Add lay odds with selection ID and type
+  //     runner.lay.forEach((odds) => {
+  //       allOdds.push({
+  //         selectionId: runner.selectionId,
+  //         odds: odds.price,
+  //         type: "lay",
+  //         name: runner.name,
+  //       })
+  //     })
+  //   })
+
+  //   // Calculate potential loss for each odd and stake combination
+  //   let minLoss = Number.POSITIVE_INFINITY
+  //   let bestOption = null
+
+  //   allOdds.forEach((odd) => {
+  //     // Try different stake values (you can adjust the range and step as needed)
+  //     for (let testStake = 100; testStake <= 10000; testStake += 100) {
+  //       const { profit, loss } = calculateProfitAndLoss(testStake, odd.odds, odd.type, "match odds")
+
+  //       const newMargin = calculateNewMargin(margin, odd.selectionId, odd.type, profit, loss)
+
+  //       // Calculate the maximum potential loss across all selections
+  //       const potentialLosses = runnersWithOdds.map((runner) => {
+  //         if (runner.selectionId === odd.selectionId) {
+  //           return newMargin.newLoss
+  //         } else {
+  //           return newMargin.newProfit
+  //         }
+  //       })
+
+  //       const maxLoss = Math.max(...potentialLosses.map(Math.abs))
+
+  //       // If this combination results in a lower maximum loss, save it
+  //       if (maxLoss < minLoss) {
+  //         minLoss = maxLoss
+  //         bestOption = {
+  //           selectionId: odd.selectionId,
+  //           odds: odd.odds,
+  //           type: odd.type,
+  //           stake: testStake,
+  //           name: odd.name,
+  //           potentialLoss: minLoss,
+  //         }
+  //       }
+  //     }
+  //   })
+
+  //   setCashoutData(bestOption)
+
+  //   // Console log the optimal bet details
+  //   console.log("OPTIMAL CASHOUT BET:", {
+  //     team: bestOption?.name,
+  //     betType: bestOption?.type,
+  //     odds: bestOption?.odds,
+  //     stake: bestOption?.stake,
+  //     potentialLoss: bestOption?.potentialLoss,
+  //   })
+  // }, [matchData, margin, runnersWithOdds])
 
   return (
     <div>
-      <div className="bg-[#1a2027] mb-2 rounded-lg overflow-hidden w-full">
-        <div className="flex flex-wrap sm:flex-nowrap bg-[#2c3847] py-2 justify-between items-center px-4 mb-0">
-          <h2 className="text-white text-lg">Match Odds</h2>
-          <div className="flex flex-wrap gap-4 items-center">
-            <div className="flex gap-1 sm:-translate-x-[130px]">
-              <span className="bg-[#00B2FF] text-black px-6 py-1 rounded text-xs sm:text-sm font-medium">
-                Back
-              </span>
-              <span className="bg-[#FF7A7F] text-black px-6 py-1 rounded text-xs sm:text-sm font-medium">
-                Lay
-              </span>
-            </div>
+    <div className="border border-[rgb(var(--color-border))] mb-2 rounded-lg overflow-hidden w-full shadow-sm">
+      <div className="flex flex-wrap sm:flex-nowrap bg-[rgb(var(--color-background))] border-b border-[rgb(var(--color-border))] py-2 justify-between items-center px-4 mb-0">
+        <h2 className="text-[rgb(var(--color-text-primary))] text-lg font-semibold">Match Odds</h2>
+        <div className="flex flex-wrap gap-4 items-center">
+          <div className="flex gap-1 sm:-translate-x-[130px]">
+            <span className="bg-[rgb(var(--color-back))] hover:bg-[rgb(var(--color-back-hover))] text-[rgb(var(--color-text-primary))] px-6 py-1 rounded text-xs sm:text-sm font-medium transition-colors">
+              Back
+            </span>
+            <span className="bg-[rgb(var(--color-lay))] hover:bg-[rgb(var(--color-lay-hover))] text-[rgb(var(--color-text-primary))] px-6 py-1 rounded text-xs sm:text-sm font-medium transition-colors">
+              Lay
+            </span>
           </div>
-        </div>
 
-        <div className="py-2 px-4">
-          {runnersWithOdds.map((runner, index) => {
-            const backOdds = (runner.back || [])
-              .map((odds) => [odds.price, odds.size])
-              .reverse();
-            const layOdds = (runner.lay || []).map((odds) => [
-              odds.price,
-              odds.size,
-            ]);
-
-            return (
-              <TeamRow
-                key={index}
-                teamName={runner.name}
-                backOdds={backOdds}
-                layOdds={layOdds}
-                onOddsClick={handleOddsClick}
-                matchData={matchData}
-                stake={stake}
-                selectedOdd={selectedOdd}
-                selectionId={runner.selectionId}
-                margin={margin}
-              />
-            );
-          })}
+          {/* <button
+              className="bg-[rgb(var(--color-primary))] px-4 rounded-md py-1 text-white hover:bg-[rgb(var(--color-primary-hover))]"
+              onClick={calculateCashout}
+            >
+              Cash Out
+            </button> */}
         </div>
       </div>
 
-      {showBetSlip && (
-        <div className="lg:hidden my-4">
-          {selectedBet ? (
-            <BetSlip
-              match={selectedBet}
-              onClose={() => setSelectedBet(null)}
-              setStake={setStake}
-              betPlaced={betPlaced}
-           
+      <div className=" bg-[rgb(var(--color-background))]">
+        {runnersWithOdds.map((runner, index) => {
+          const backOdds = (runner.back || []).map((odds) => [odds.price, odds.size]).reverse()
+          const layOdds = (runner.lay || []).map((odds) => [odds.price, odds.size])
+
+          return (
+            <TeamRow
+              key={index}
+              teamName={runner.name}
+              backOdds={backOdds}
+              layOdds={layOdds}
+              onOddsClick={handleOddsClick}
+              matchData={matchData}
+              stake={stake}
+              selectedOdd={selectedOdd}
+              selectionId={runner.selectionId}
+              margin={margin}
+              // cashoutData={cashoutData}
+
             />
-          ) : (
-            <div className="bg-[#1a2027] p-4 rounded-lg text-white text-center">
-              Select an odd to place a bet
-            </div>
-          )}
-        </div>
-      )}
+          )
+        })}
+      </div>
     </div>
+
+    {showBetSlip && (
+      <div className="lg:hidden my-4">
+        {selectedBet ? (
+          <BetSlip
+            match={selectedBet}
+            onClose={() => setSelectedBet(null)}
+            setStake={setStake}
+            betPlaced={betPlaced}
+          />
+        ) : (
+          <>
+          </>
+        )}
+      </div>
+    )}
+  </div>
   );
 };
 

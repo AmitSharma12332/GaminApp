@@ -1,6 +1,6 @@
 /* eslint-disable react/prop-types */
-import { ChevronDown, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { ChevronDown, ChevronRight } from 'lucide-react';
+import { useCallback, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 
 // Static sports data with live cricket data to be added
@@ -61,7 +61,7 @@ const AllGames = ({ sportsData }) => {
   const [cricketGames, setCricketGames] = useState([]);
   const [totalGames, setTotalGames] = useState(0);
 
-  const handleSportsData = (data) => {
+  const handleSportsData = useCallback((data) => {
     try {
       // Safely access nested data with optional chaining
       const cricketData = data?.[4]?.[4] || [];
@@ -76,7 +76,7 @@ const AllGames = ({ sportsData }) => {
         }
 
         // Only add the match if it has the required data
-        if (match.event?.event) {
+        if (match.event?.event?.id && match.event?.event?.name) {
           acc[seriesName].push({
             id: match.event.event.id,
             name: match.event.event.name,
@@ -113,13 +113,13 @@ const AllGames = ({ sportsData }) => {
       setCricketGames([]);
       setTotalGames(staticSports.reduce((acc, sport) => acc + sport.count, 0));
     }
-  };
+  }, []);
 
   useEffect(() => {
     if (sportsData) {
       handleSportsData(sportsData);
     }
-  }, [sportsData]);
+  }, [sportsData, handleSportsData]); // Removed handleSportsData from dependencies
 
   // Combine cricket with other sports
   const sports = [
@@ -133,10 +133,10 @@ const AllGames = ({ sportsData }) => {
   ];
 
   return (
-    <div className="lg:h-[calc(100vh-64px)] h-full bg-[#21252b] lg:border mt-2 rounded-lg border-dashed border-zinc-700 text-gray-300 p-4 w-full">
+    <div className="lg:h-[calc(100vh-64px)] h-full lg:border mt-2 lg:rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-background))] text-[rgb(var(--color-text-primary))] p-4 w-full">
       <div className="mb-2">
-        <span className="text-xs text-gray-500">SPORTS</span>
-        <span className="float-right text-[#3ea6ff] text-sm">{totalGames}</span>
+        <span className="text-xs font-medium text-[rgb(var(--color-text-muted))]">SPORTS</span>
+        <span className="float-right text-[rgb(var(--color-primary))] text-sm">{totalGames}</span>
       </div>
 
       <div className="space-y-1">
@@ -146,11 +146,11 @@ const AllGames = ({ sportsData }) => {
               onClick={() =>
                 setOpenSport(openSport === sport.name ? null : sport.name)
               }
-              className="flex items-center w-full px-2 py-1.5 hover:bg-gray-800 rounded-lg transition-colors"
+              className="flex items-center w-full px-2 py-1.5 hover:bg-[rgb(var(--color-background-hover))] rounded-lg transition-colors"
             >
               <span className="mr-2">{sport.icon}</span>
-              <span className="text-lg">{sport.name}</span>
-              <span className="ml-auto text-[#3ea6ff]">{sport.count}</span>
+              <span className="">{sport.name}</span>
+              <span className="ml-auto text-[rgb(var(--color-primary))]">{sport.count}</span>
               {sport.subItems?.length > 0 && (
                 <span className="ml-2">
                   {openSport === sport.name ? (
@@ -172,10 +172,10 @@ const AllGames = ({ sportsData }) => {
                           openSeries === series.name ? null : series.name
                         )
                       }
-                      className="flex items-center px-2 py-1.5 hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+                      className="flex items-center px-2 py-1.5 hover:bg-[rgb(var(--color-background-hover))] rounded-lg transition-colors cursor-pointer"
                     >
                       <span className="text-sm">{series.name}</span>
-                      <span className="ml-auto text-[#3ea6ff]">
+                      <span className="ml-auto text-[rgb(var(--color-primary-light))]">
                         {series.count}
                       </span>
                       <ChevronRight
@@ -191,7 +191,7 @@ const AllGames = ({ sportsData }) => {
                         {series.games?.map((game) => (
                           <div
                             key={game.id}
-                            className="flex flex-col px-2 py-1.5 hover:bg-gray-800 rounded-lg transition-colors cursor-pointer"
+                            className="flex flex-col px-2 py-1.5 hover:bg-[rgb(var(--color-background-hover))] rounded-lg transition-colors cursor-pointer"
                           >
                             <div className="flex items-center gap-2">
                               {/* {game.inPlay && (
@@ -199,7 +199,7 @@ const AllGames = ({ sportsData }) => {
                               )} */}
                               <Link
                                 to={`/match/${game.id}`}
-                                className="text-sm text-gray-300 hover:text-blue-400 transition-colors"
+                                className="text-sm text-[rgb(var(--color-text-secondary))] hover:text-[rgb(var(--color-primary-dark))] transition-colors"
                               >
                                 {game.name}
                               </Link>

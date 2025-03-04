@@ -2,19 +2,9 @@
 
 /* eslint-disable react-hooks/exhaustive-deps */
 import axios from "axios"
+import { Ban, ChevronLeft, ChevronRight, Mail, Plus, Search, Shield, UserCircle, Wallet } from "lucide-react"
 import { useCallback, useEffect, useState } from "react"
 import toast from "react-hot-toast"
-import {
-  FaBan,
-  FaCheckCircle,
-  FaChevronLeft,
-  FaChevronRight,
-  FaEnvelope,
-  FaMoneyBillWave,
-  FaPlus,
-  FaSearch,
-  FaUserTag,
-} from "react-icons/fa"
 import { server } from "../../constants/config"
 
 const UserForm = () => {
@@ -201,7 +191,7 @@ const UserForm = () => {
       )
       toast.success(response.data?.message)
       closeAddMoneyDialog()
-      fetchUsers() // Refresh user list
+      fetchUsers()
     } catch (error) {
       toast.error(error.response?.data?.message || "Failed to update amount. Please try again later.")
       console.error("Error updating amount:", error)
@@ -215,14 +205,14 @@ const UserForm = () => {
   const paginate = (pageNumber) => setCurrentPage(pageNumber)
 
   return (
-    <div className="max-w-6xl mx-auto p-4  text-white">
+    <div className="text-[rgb(var(--color-text-primary))]">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-semibold">User Management</h1>
         <button
           onClick={() => setIsAddingUser(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 flex items-center"
+          className="px-4 py-2 bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-[rgb(var(--color-primary-dark))] transition-colors flex items-center gap-2"
         >
-          <FaPlus className="mr-2" /> Add User
+          <Plus className="h-4 w-4" /> Add User
         </button>
       </div>
 
@@ -233,9 +223,9 @@ const UserForm = () => {
             placeholder="Search users..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full px-4 py-2 bg-gray-800 text-white rounded-md pl-10"
+            className="max-w-80 px-4 py-2 bg-[rgb(var(--color-background))] border border-[rgb(var(--color-border))] text-[rgb(var(--color-text-primary))] rounded-lg pl-10"
           />
-          <FaSearch className="absolute left-3 top-3 text-gray-400" />
+          <Search className="absolute left-3 top-3 text-[rgb(var(--color-text-muted))] h-4 w-4" />
         </div>
       </div>
 
@@ -245,46 +235,50 @@ const UserForm = () => {
         <p className="text-red-500">{error}</p>
       ) : (
         <div className="overflow-x-auto">
-          <table className=" bg-gray-800 rounded-lg overflow-hidden">
-            <thead className="bg-gray-700">
+          <table className="w-full bg-[rgb(var(--color-background))] rounded-lg overflow-hidden border border-[rgb(var(--color-border))]">
+            <thead className="bg-[rgb(var(--color-background-hover))]">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Name</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--color-text-muted))] uppercase tracking-wider">
+                  Name
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--color-text-muted))] uppercase tracking-wider">
                   Email
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--color-text-muted))] uppercase tracking-wider">
                   Amount
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--color-text-muted))] uppercase tracking-wider">
                   Currency
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--color-text-muted))] uppercase tracking-wider">
                   Status
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Role</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--color-text-muted))] uppercase tracking-wider">
+                  Role
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-[rgb(var(--color-text-muted))] uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-gray-800 divide-y divide-gray-700">
+            <tbody className="divide-y divide-[rgb(var(--color-border))]">
               {currentUsers.map((user) => (
-                <tr key={user._id}>
+                <tr key={user._id} className="hover:bg-[rgb(var(--color-background-hover))] transition-colors">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex capitalize flex-col items-start">
                       {user.name}
-                      <span className="text-xs text-gray-400">{user._id}</span>
+                      <span className="text-xs text-[rgb(var(--color-text-muted))]">{user._id}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <FaEnvelope className="mr-2 text-gray-400" />
+                      <Mail className="mr-2 text-[rgb(var(--color-text-muted))] h-4 w-4" />
                       {user.email}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <FaMoneyBillWave className="mr-2 text-gray-400" />
+                      <Wallet className="mr-2 text-[rgb(var(--color-text-muted))] h-4 w-4" />
                       {user.amount.toFixed(2)}
                     </div>
                   </td>
@@ -293,35 +287,34 @@ const UserForm = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex capitalize items-center">
-                      <FaCheckCircle
-                        className={`mr-2 ${user.status === "banned" ? "text-red-500" : "text-green-500"}`}
+                      <Shield
+                        className={`mr-2 h-4 w-4 ${user.status === "banned" ? "text-red-500" : "text-green-500"}`}
                       />
                       {user.status}
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex capitalize items-center">
-                      <FaUserTag className="mr-2 text-gray-400" />
+                      <UserCircle className="mr-2 text-[rgb(var(--color-text-muted))] h-4 w-4" />
                       {user.role}
                     </div>
                   </td>
-
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleBanActionClick(user)}
-                        className={`px-3 py-1 rounded text-white flex items-center ${
-                          user.status === "banned" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
+                        className={`px-3 py-1 rounded-lg text-white flex items-center gap-1 ${
+                          user.status === "banned" ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
                         }`}
                       >
-                        <FaBan className="mr-1" />
+                        <Ban className="h-4 w-4" />
                         {user.status === "banned" ? "Active" : "Ban"}
                       </button>
                       <button
                         onClick={() => openAddMoneyDialog(user._id)}
-                        className="px-3 py-1 bg-green-600 text-white rounded hover:bg-green-700 flex items-center"
+                        className="px-3 py-1 bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-[rgb(var(--color-primary-dark))] flex items-center gap-1"
                       >
-                        <FaPlus className="mr-1" />
+                        <Plus className="h-4 w-4" />
                         Add Money
                       </button>
                     </div>
@@ -334,23 +327,23 @@ const UserForm = () => {
       )}
 
       <div className="mt-4 flex justify-center">
-        <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+        <nav className="relative z-0 inline-flex rounded-lg shadow-sm -space-x-px" aria-label="Pagination">
           <button
             onClick={() => paginate(currentPage - 1)}
             disabled={currentPage === 1}
-            className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-700 bg-gray-800 text-sm font-medium text-gray-400 hover:bg-gray-700"
+            className="relative inline-flex items-center px-2 py-2 rounded-l-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-background))] text-sm font-medium text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-background-hover))]"
           >
             <span className="sr-only">Previous</span>
-            <FaChevronLeft className="h-5 w-5" aria-hidden="true" />
+            <ChevronLeft className="h-5 w-5" aria-hidden="true" />
           </button>
-          {Array.from({
-            length: Math.ceil(filteredUsers.length / usersPerPage),
-          }).map((_, index) => (
+          {Array.from({ length: Math.ceil(filteredUsers.length / usersPerPage) }).map((_, index) => (
             <button
               key={index}
               onClick={() => paginate(index + 1)}
-              className={`relative inline-flex items-center px-4 py-2 border border-gray-700 bg-gray-800 text-sm font-medium ${
-                currentPage === index + 1 ? "text-blue-500" : "text-gray-400 hover:bg-gray-700"
+              className={`relative inline-flex items-center px-4 py-2 border border-[rgb(var(--color-border))] bg-[rgb(var(--color-background))] text-sm font-medium ${
+                currentPage === index + 1
+                  ? "text-[rgb(var(--color-primary))]"
+                  : "text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-background-hover))]"
               }`}
             >
               {index + 1}
@@ -359,122 +352,96 @@ const UserForm = () => {
           <button
             onClick={() => paginate(currentPage + 1)}
             disabled={currentPage === Math.ceil(filteredUsers.length / usersPerPage)}
-            className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-700 bg-gray-800 text-sm font-medium text-gray-400 hover:bg-gray-700"
+            className="relative inline-flex items-center px-2 py-2 rounded-r-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-background))] text-sm font-medium text-[rgb(var(--color-text-muted))] hover:bg-[rgb(var(--color-background-hover))]"
           >
             <span className="sr-only">Next</span>
-            <FaChevronRight className="h-5 w-5" aria-hidden="true" />
+            <ChevronRight className="h-5 w-5" aria-hidden="true" />
           </button>
         </nav>
       </div>
 
       {/* Add User Dialog */}
       {isAddingUser && (
-        <div className="fixed z-[99] inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-gray-800 p-4 rounded-lg w-96">
-            <h2 className="text-xl font-semibold mb-2">Add New User</h2>
+        <div className="fixed z-[99] inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center">
+          <div className="bg-[rgb(var(--color-background))] p-6 rounded-lg w-96 border border-[rgb(var(--color-border))]">
+            <h2 className="text-xl font-semibold mb-4">Add New User</h2>
             <div className="space-y-4">
-              <div>
-                <label htmlFor="name" className="block text-sm font-medium text-gray-300">
-                  Name
-                </label>
-                <input
-                  type="text"
-                  id="name"
-                  value={newUserData.name}
-                  onChange={(e) => setNewUserData({ ...newUserData, name: e.target.value })}
-                  className="mt-1 h-10 p-4 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div>
-                <label htmlFor="email" className="block text-sm font-medium text-gray-300">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  id="email"
-                  value={newUserData.email}
-                  onChange={(e) => setNewUserData({ ...newUserData, email: e.target.value })}
-                  className="mt-1 block w-full h-10 p-4 rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div>
-                <label htmlFor="password" className="block text-sm font-medium text-gray-300">
-                  Password
-                </label>
-                <input
-                  type="password"
-                  id="password"
-                  value={newUserData.password}
-                  onChange={(e) => setNewUserData({ ...newUserData, password: e.target.value })}
-                  className="mt-1 block w-full h-10 p-4 rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
-              <div>
-                <label htmlFor="currency" className="block text-sm font-medium text-gray-300">
-                  Currency
-                </label>
-                <select
-                  id="currency"
-                  value={newUserData.currency}
-                  onChange={(e) => setNewUserData({ ...newUserData, currency: e.target.value })}
-                  className="mt-1 block w-full h-10  rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                >
-                  <option value="INR">INR</option>
-                  <option value="EUR">EUR</option>
-                  <option value="USD">USD</option>
-                </select>
-              </div>
-              <div>
-                <label htmlFor="role" className="block text-sm font-medium text-gray-300">
-                  Role
-                </label>
-                <select
-                  id="role"
-                  value={newUserData.role}
-                  onChange={(e) => setNewUserData({ ...newUserData, role: e.target.value })}
-                  className="mt-1 block w-full h-10  rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                >
-                  <option value="user">User</option>
-                  <option value="admin">Admin</option>
-                </select>
-              </div>
-              <div>
-                <label htmlFor="gender" className="block text-sm font-medium text-gray-300">
-                  Gender
-                </label>
-                <select
-                  id="gender"
-                  value={newUserData.gender}
-                  onChange={(e) => setNewUserData({ ...newUserData, gender: e.target.value })}
-                  className="mt-1 block w-full h-10  rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                >
-                  <option value="">Select gender</option>
-                  <option value="male">Male</option>
-                  <option value="female">Female</option>
-                  <option value="other">Other</option>
-                </select>
-              </div>
-              <div>
-                <label htmlFor="amount" className="block text-sm font-medium text-gray-300">
-                  Initial Amount
-                </label>
-                <input
-                  type="number"
-                  id="amount"
-                  value={newUserData.amount}
-                  onChange={(e) => setNewUserData({ ...newUserData, amount: e.target.value })}
-                  className="mt-1 block w-full h-10 p-4 rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
-                />
-              </div>
+              {[
+                { id: "name", label: "Name", type: "text" },
+                { id: "email", label: "Email", type: "email" },
+                { id: "password", label: "Password", type: "password" },
+                {
+                  id: "currency",
+                  label: "Currency",
+                  type: "select",
+                  options: [
+                    { value: "INR", label: "INR" },
+                    { value: "EUR", label: "EUR" },
+                    { value: "USD", label: "USD" },
+                  ],
+                },
+                {
+                  id: "role",
+                  label: "Role",
+                  type: "select",
+                  options: [
+                    { value: "user", label: "User" },
+                    { value: "admin", label: "Admin" },
+                  ],
+                },
+                {
+                  id: "gender",
+                  label: "Gender",
+                  type: "select",
+                  options: [
+                    { value: "", label: "Select gender" },
+                    { value: "male", label: "Male" },
+                    { value: "female", label: "Female" },
+                    { value: "other", label: "Other" },
+                  ],
+                },
+                { id: "amount", label: "Initial Amount", type: "number" },
+              ].map((field) => (
+                <div key={field.id}>
+                  <label htmlFor={field.id} className="block text-sm font-medium text-[rgb(var(--color-text-primary))]">
+                    {field.label}
+                  </label>
+                  {field.type === "select" ? (
+                    <select
+                      id={field.id}
+                      value={newUserData[field.id]}
+                      onChange={(e) => setNewUserData({ ...newUserData, [field.id]: e.target.value })}
+                      className="mt-1 block w-full h-10 rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-background))] text-[rgb(var(--color-text-primary))] shadow-sm focus:border-[rgb(var(--color-primary))] focus:ring focus:ring-[rgb(var(--color-primary))] focus:ring-opacity-50"
+                    >
+                      {field.options.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type={field.type}
+                      id={field.id}
+                      value={newUserData[field.id]}
+                      onChange={(e) => setNewUserData({ ...newUserData, [field.id]: e.target.value })}
+                      className="mt-1 block w-full h-10 px-3 rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-background))] text-[rgb(var(--color-text-primary))] shadow-sm focus:border-[rgb(var(--color-primary))] focus:ring focus:ring-[rgb(var(--color-primary))] focus:ring-opacity-50"
+                    />
+                  )}
+                </div>
+              ))}
             </div>
             <div className="mt-6 flex justify-end space-x-3">
               <button
                 onClick={() => setIsAddingUser(false)}
-                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                className="px-4 py-2 border border-[rgb(var(--color-border))] text-[rgb(var(--color-text-primary))] rounded-lg hover:bg-[rgb(var(--color-background-hover))]"
               >
                 Cancel
               </button>
-              <button onClick={postNewUser} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+              <button
+                onClick={postNewUser}
+                className="px-4 py-2 bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-[rgb(var(--color-primary-dark))]"
+              >
                 Add User
               </button>
             </div>
@@ -484,30 +451,33 @@ const UserForm = () => {
 
       {/* Add Money Dialog */}
       {isAddMoneyDialogOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-gray-800 p-6 rounded-lg w-96">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center">
+          <div className="bg-[rgb(var(--color-background))] p-6 rounded-lg w-96 border border-[rgb(var(--color-border))]">
             <h2 className="text-xl font-semibold mb-4">Add Amount</h2>
             <div>
-              <label htmlFor="amount" className="block text-sm font-medium text-gray-300">
+              <label htmlFor="amount" className="block text-sm font-medium text-[rgb(var(--color-text-primary))]">
                 Amount
               </label>
               <input
                 type="number"
                 id="amount"
-                placeholder="enter amount to add"
+                placeholder="Enter amount to add"
                 value={amount}
                 onChange={(e) => setAmount(Number(e.target.value))}
-                className="mt-1 h-10 p-4 block w-full rounded-md border-gray-600 bg-gray-700 text-white shadow-sm focus:border-blue-500 focus:ring focus:ring-blue-500 focus:ring-opacity-50"
+                className="mt-1 block w-full h-10 px-3 rounded-lg border border-[rgb(var(--color-border))] bg-[rgb(var(--color-background))] text-[rgb(var(--color-text-primary))] shadow-sm focus:border-[rgb(var(--color-primary))] focus:ring focus:ring-[rgb(var(--color-primary))] focus:ring-opacity-50"
               />
             </div>
             <div className="mt-6 flex justify-end space-x-3">
               <button
                 onClick={closeAddMoneyDialog}
-                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                className="px-4 py-2 border border-[rgb(var(--color-border))] text-[rgb(var(--color-text-primary))] rounded-lg hover:bg-[rgb(var(--color-background-hover))]"
               >
                 Cancel
               </button>
-              <button onClick={handleAddMoney} className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+              <button
+                onClick={handleAddMoney}
+                className="px-4 py-2 bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-[rgb(var(--color-primary-dark))]"
+              >
                 Add Money
               </button>
             </div>
@@ -517,8 +487,8 @@ const UserForm = () => {
 
       {/* Ban/Unban Confirmation Dialog */}
       {isBanConfirmOpen && userToModify && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
-          <div className="bg-gray-800 p-6 rounded-lg w-96">
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-50">
+          <div className="bg-[rgb(var(--color-background))] p-6 rounded-lg w-96 border border-[rgb(var(--color-border))]">
             <h2 className="text-xl font-semibold mb-4">Confirm Action</h2>
             <p className="mb-6">
               Are you sure you want to {userToModify.status === "banned" ? "active" : "ban"} user{" "}
@@ -530,14 +500,14 @@ const UserForm = () => {
                   setIsBanConfirmOpen(false)
                   setUserToModify(null)
                 }}
-                className="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700"
+                className="px-4 py-2 border border-[rgb(var(--color-border))] text-[rgb(var(--color-text-primary))] rounded-lg hover:bg-[rgb(var(--color-background-hover))]"
               >
                 Cancel
               </button>
               <button
                 onClick={handleUserStatusChange}
-                className={`px-4 py-2 text-white rounded ${
-                  userToModify.status === "banned" ? "bg-green-600 hover:bg-green-700" : "bg-red-600 hover:bg-red-700"
+                className={`px-4 py-2 text-white rounded-lg ${
+                  userToModify.status === "banned" ? "bg-green-500 hover:bg-green-600" : "bg-red-500 hover:bg-red-600"
                 }`}
               >
                 {userToModify.status === "banned" ? "Active" : "Ban"} User

@@ -1,72 +1,63 @@
 /* eslint-disable react/prop-types */
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Menu } from 'lucide-react'
+import { useState } from "react"
+import { Link } from "react-router-dom"
 
 const menuItems = [
   { id: "dashboard", icon: "📊", label: "Dashboard", href: "/admin" },
   { id: "users", icon: "👥", label: "Users", href: "/admin/usermanagement" },
   { id: "requests", icon: "🛍️", label: "All Bets", href: "/admin/requests" },
   { id: "settings", icon: "⚙️", label: "Settings", href: "/admin/management" },
-];
+]
 
 const Sidebar = ({ activeTab, setActiveTab }) => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false)
 
   const toggleSidebar = () => {
-    setIsOpen((prev) => !prev);
-  };
+    setIsOpen((prev) => !prev)
+  }
 
   return (
     <>
       {/* Hamburger button for mobile */}
       <button
-        className="fixed top-28 left-2 z-20 lg:hidden bg-gray-800 text-white p-2 rounded-md"
+        className="fixed top-32 left-2 z-20 lg:hidden bg-[rgb(var(--color-background))] text-[rgb(var(--color-text-primary))] p-2 rounded-lg border border-[rgb(var(--color-border))] hover:bg-[rgb(var(--color-background-hover))] transition-colors"
         onClick={toggleSidebar}
         aria-label="Toggle menu"
       >
-        <svg
-          className="w-6 h-6"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M4 6h16M4 12h16M4 18h16"
-          />
-        </svg>
+        <Menu className="w-6 h-6" />
       </button>
 
       {/* Sidebar */}
       <div
-        className={`fixed top-24 lg:top-0  bg-gray-800 left-0 z-30 w-64  text-white h-full transition-transform duration-300 ease-in-out transform ${
+        className={`fixed lg:top-0 bg-[rgb(var(--color-background))] border-r border-[rgb(var(--color-border))] left-0 z-30 w-64 h-full transition-transform duration-300 ease-in-out transform ${
           isOpen ? "translate-x-0" : "-translate-x-full"
-        } md:relative md:translate-x-0`}
+        } lg:relative lg:translate-x-0 shadow-lg`}
       >
-        <div className="p-4">
-          <h2 className="text-2xl font-bold">Admin Panel</h2>
+        <div className="p-6 border-b border-[rgb(var(--color-border))]">
+          <h2 className="text-2xl font-bold text-[rgb(var(--color-primary))]">Admin Panel</h2>
         </div>
-        <nav>
-          <ul>
+        
+        <nav className="p-2">
+          <ul className="space-y-1">
             {menuItems.map((item) => (
               <li key={item.id}>
                 <Link
                   to={item.href}
                   onClick={() => {
-                    setActiveTab(item.id);
-                    setIsOpen(false); // Close sidebar on mobile after selection
+                    setActiveTab(item.id)
+                    setIsOpen(false)
                   }}
-                  className={`block my-1 p-4 hover:bg-gray-700 transition-colors ${
-                    activeTab === item.id ? "bg-gray-700" : ""
+                  className={`flex items-center px-4 py-3 rounded-lg transition-colors ${
+                    activeTab === item.id
+                      ? "bg-[rgb(var(--color-primary))] text-white"
+                      : "text-[rgb(var(--color-text-primary))] hover:bg-[rgb(var(--color-background-hover))]"
                   }`}
                 >
-                  <span className="mr-2" role="img" aria-label={item.label}>
+                  <span className="mr-3 text-lg" role="img" aria-label={item.label}>
                     {item.icon}
                   </span>
-                  {item.label}
+                  <span className="font-medium">{item.label}</span>
                 </Link>
               </li>
             ))}
@@ -77,12 +68,12 @@ const Sidebar = ({ activeTab, setActiveTab }) => {
       {/* Overlay to close sidebar on mobile */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-10 md:hidden"
+          className="fixed inset-0 bg-black/20 backdrop-blur-sm z-20 lg:hidden"
           onClick={toggleSidebar}
-        ></div>
+        />
       )}
     </>
-  );
-};
+  )
+}
 
-export default Sidebar;
+export default Sidebar

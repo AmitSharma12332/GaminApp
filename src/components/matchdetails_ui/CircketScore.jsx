@@ -1,10 +1,14 @@
 /* eslint-disable react/prop-types */
-import axios from "axios";
-import { useEffect, useState } from "react";
+"use client";
 
-const CricketScore = ({ eventId }) => {
-  const [scoreData, setScoreData] = useState(null);
+import axios from "axios";
+import { useEffect, useState, useRef } from "react";
+
+const CricketScoreDirect = ({ eventId }) => {
+  const [htmlContent, setHtmlContent] = useState("");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const iframeRef = useRef(null);
 
   useEffect(() => {
     let intervalId;
@@ -14,102 +18,195 @@ const CricketScore = ({ eventId }) => {
         const response = await axios.get(
           `https://testscapi.fpl11.com/api/admin/cricketscore?eventid=${eventId}`
         );
-
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(response.data, "text/html");
-
-        const teams = doc.querySelectorAll(".team");
-
-        const team1Name =
-          teams[0]?.querySelector(".team_name")?.textContent ||
-          "Not Started Yet";
-        const team1Run = teams[0]?.querySelector(".run")?.textContent || "0/0";
-        const team1Over =
-          teams[1]?.querySelectorAll(".over")[0]?.textContent || "(0.0)";
-        const team1RR =
-          teams[0]?.querySelectorAll(".over")[1]?.textContent ||
-          "CRR: 0 | RRR: 0.0";
-
-        const team2Name =
-          teams[1]?.querySelector(".team_name")?.textContent ||
-          "Not Started Yet";
-        const team2Run = teams[1]?.querySelector(".run")?.textContent || "0/0";
-        const team2Over =
-          teams[0]?.querySelectorAll(".over")[0]?.textContent || "(0.0)";
-        const team2RR =
-          teams[1]?.querySelectorAll(".over")[1]?.textContent ||
-          "CRR: 0 | RRR: 0.0";
-
-        const newScoreData = {
-          team1: {
-            name: team1Name,
-            run: team1Run,
-            over: team1Over,
-            rr: team1RR,
-          },
-          team2: {
-            name: team2Name,
-            run: team2Run,
-            over: team2Over,
-            rr: team2RR,
-          },
-        };
-
-        setScoreData(newScoreData);
-        localStorage.setItem(
-          `cricketScore_${eventId}`,
-          JSON.stringify(newScoreData)
-        );
+        if (response.data.trim() === "") {
+          setHtmlContent("<p>Match not started yet</p>");
+        } else {
+          setHtmlContent(response.data);
+        }
+        setError(null);
+        localStorage.setItem(`cricketScoreHtml_${eventId}`, response.data);
       } catch (err) {
         console.error("Error fetching scores:", err);
+        setError("Failed to fetch cricket scores");
+        const cachedHtml = localStorage.getItem(`cricketScoreHtml_${eventId}`);
+        if (cachedHtml) {
+          setHtmlContent(cachedHtml);
+          setError(null);
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchScores();
-    intervalId = setInterval(fetchScores, 500);
+    intervalId = setInterval(fetchScores, 1000);
 
     return () => clearInterval(intervalId);
   }, [eventId]);
 
-  if (loading)
+  useEffect(() => {
+    if (iframeRef.current && htmlContent) {
+      const iframe = iframeRef.current;
+      const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+      
+      const completeHtml = `
+        <!DOCTYPE html>
+        <html>
+          <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <style>
+              * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+                font-family: "Chakra Petch", sans-serif;
+              }
+              
+              body {
+                background-color: #000000;
+                color: white;
+                font-size: 12px;
+                line-height: 1.4;
+                overflow-x: hidden;
+              }
+              
+              .sc_cw-body {
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                overflow-x: hidden;
+                background-color: #000000 !important;
+              }
+              
+              .sc_cw-main-container {
+                width: 100%;
+                background-color: #000000 !important;
+                border-radius: 0.5rem;
+              }
+              
+              .sc_cw-header {
+                color: white !important;
+                background-color: #000000 !important;
+              }
+              
+              .sc_cw-team-info-desktop, 
+              .sc_cw-team-info-mobile {
+                color: white !important;
+                background-color: #000000 !important;
+              }
+              
+              .sc_cw-team-info-desktop span, 
+              .sc_cw-team-info-mobile span {
+                color: white !important;
+              }
+              
+              .sc_cw-table-heading {
+                background-color: #202020 !important;
+                color: white !important;
+              }
+              
+              .sc_cw-table-row, 
+              .sc_cw-desktop-row, 
+              .sc_cw-mobile-row {
+                background-color: #000000 !important;
+                color: white !important;
+              }
+              
+              .sc_cw-table-row div, 
+              .sc_cw-desktop-row div, 
+              .sc_cw-mobile-row div {
+                color: white !important;
+              }
+              
+              .sc_cw-other-info, 
+              .sc_cw-other-info-mobile {
+                background-color: #202020 !important;
+                color: white !important;
+              }
+              
+              .sc_cw-overs-info, 
+              .sc_cw-overs-info-mobile {
+                background-color: #000000 !important;
+                color: white !important;
+              }
+              
+              .sc_cw-mobile-label {
+                background-color: #868686 !important;
+                color: #000000 !important;
+              }
+              
+              svg path {
+                fill: white !important;
+              }
+            </style>
+            <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+          </head>
+          <body>
+            ${htmlContent}
+          </body>
+        </html>
+      `;
+      
+      iframeDoc.open();
+      iframeDoc.write(completeHtml);
+      iframeDoc.close();
+    }
+  }, [htmlContent]);
+
+  if (loading) {
     return (
-      <div className="text-white h-24 w-full flex justify-center items-center text-center">
-        Loading scores...
+      <div className="h-24 w-full flex justify-center items-center text-center">
+        <div className="animate-pulse flex flex-col items-center">
+          <div
+            className="h-4 w-24 rounded mb-2"
+            style={{ backgroundColor: `rgba(var(--color-primary), 0.3)` }}
+          ></div>
+          <div
+            className="h-6 w-32 rounded"
+            style={{ backgroundColor: `rgba(var(--color-primary), 0.3)` }}
+          ></div>
+        </div>
       </div>
     );
+  }
+
+  if (error && !htmlContent) {
+    return (
+      <div
+        className="h-24 w-full flex justify-center items-center text-center"
+        style={{ color: `rgb(var(--color-primary-dark))` }}
+      >
+        {error}
+      </div>
+    );
+  }
 
   return (
-    <div className="p-4 sm:p-6 bg-[#1a2027] border-dashed border-zinc-700 border my-2 rounded-lg">
-      <div className="flex flex-wrap justify-between items-center text-white text-xs sm:text-sm">
-        <div className="w-full sm:w-auto mb-2 sm:mb-0">
-          <h2 className="font-semibold text-sm sm:text-lg">
-            {scoreData.team1.name}
-          </h2>
-          <span className="text-gray-400 text-[10px] sm:text-sm">
-            {scoreData.team1.rr}
-          </span>
-        </div>
-        <div className="text-center flex-1">
-          <div className="text-base sm:text-xl font-bold">
-            {scoreData.team1.run} : {scoreData.team2.run}
-          </div>
-          <div className="text-[10px] sm:text-xs text-gray-400">
-            {scoreData.team2.over} | {scoreData.team1.over}
-          </div>
-        </div>
-        <div className="w-full sm:w-auto text-right">
-          <h2 className="font-semibold text-sm sm:text-lg">
-            {scoreData.team2.name}
-          </h2>
-          <span className="text-gray-400 text-[10px] sm:text-sm">
-            {scoreData.team2.rr}
-          </span>
-        </div>
+    <div className="cricket-score-container rounded-lg overflow-hidden my-4">
+      <div
+        className="p-2"
+        style={{ backgroundColor: `rgb(var(--color-primary-lighter))` }}
+      >
+        <h3
+          className="text-sm font-bold"
+          style={{ color: `rgb(var(--color-primary-dark))` }}
+        >
+          Live Cricket Score
+        </h3>
       </div>
+      <iframe
+        ref={iframeRef}
+        title="Cricket Score"
+        className="w-full h-40 p-2 md:h-48  border-none bg-black"
+        style={{ 
+         
+          maxWidth: "100%",
+          borderRadius: "0 0 0.5rem 0.5rem"
+        }}
+      />
     </div>
   );
 };
 
-export default CricketScore;
+export default CricketScoreDirect;

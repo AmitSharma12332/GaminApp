@@ -1,20 +1,20 @@
-import axios from "axios";
-import { useState } from "react";
-import toast from "react-hot-toast";
-import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
-import { server } from "../constants/config";
-import { userExist } from "../redux/reducer/userReducer";
+import axios from "axios"
+import { useState } from "react"
+import toast from "react-hot-toast"
+import { useDispatch } from "react-redux"
+import { useNavigate } from "react-router-dom"
+import { server } from "../constants/config"
+import { userExist } from "../redux/reducer/userReducer"
 
 const Login = () => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    const toastId = toast.loading("Logging In...");
+    e.preventDefault()
+    const toastId = toast.loading("Logging In...")
 
     try {
       const { data } = await axios.post(
@@ -29,111 +29,118 @@ const Login = () => {
             "Content-Type": "application/json",
           },
         }
-      );
+      )
 
-      localStorage.setItem("authToken", data.token);
-      dispatch(userExist(data.user));
-      toast.success(data.message, { id: toastId });
-      navigate("/");
+      localStorage.setItem("authToken", data.token)
+      dispatch(userExist(data.user))
+      toast.success(data.message, { id: toastId })
+      navigate("/")
     } catch (error) {
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
+      if (error.response && error.response.data && error.response.data.message) {
         toast.error(error.response.data.message, {
           id: toastId,
-        });
+        })
       } else {
         toast.error("Something went wrong. Please try again later.", {
           id: toastId,
-        });
+        })
       }
     }
-  };
+  }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-950 flex">
+    <div className=" h-full lg:min-h-screen bg-[rgb(var(--color-background))] flex">
       {/* Left side with logo */}
-      <div className="w-[80%] hidden justify-center items-center lg:flex p-8">
-        <div>
-          <h1 className="text-4xl max-w-3xl font-bold text-white mb-2">
-            Hi, Welcome back
+      <div className="w-[60%] hidden lg:flex flex-col justify-center items-start p-12">
+        <div className="max-w-2xl">
+          <img src="/logo.webp" alt="Logo" className="w-24 h-24 mb-8" />
+          <h1 className="text-5xl font-bold text-[rgb(var(--color-text-primary))] mb-4">
+            Welcome back to{" "}
+            <span className="text-[rgb(var(--color-primary))]">Shaktiex</span>
           </h1>
+          <p className="text-[rgb(var(--color-text-muted))] text-lg">
+            Sign in to continue to your account and access all features
+          </p>
         </div>
       </div>
 
       {/* Right side with login form */}
-      <div className="lg:w-1/2 w-full flex flex-col items-center justify-center pt-4 px-6">
-        <div className="max-w-md w-full space-y-8">
-          <div>
-            <h2 className="text-2xl font-semibold text-white mb-8">
-              Sign in to <span className="text-orange-400">Shaktiex!!</span>
+      <div className="lg:w-[40%] w-full flex flex-col items-center justify-center p-6 bg-[rgb(var(--color-background))] relative">
+        <div className="absolute inset-0 bg-[rgb(var(--color-primary))] opacity-5 pointer-events-none" />
+        
+        <div className="max-w-md w-full space-y-8 relative">
+          {/* Mobile Logo */}
+          <div className="lg:hidden flex flex-col items-center mb-8">
+            <img src="/logo.webp" alt="Logo" className="w-16 h-16 mb-4" />
+            <h2 className="text-2xl font-bold text-[rgb(var(--color-text-primary))]">
+              Welcome to <span className="text-[rgb(var(--color-primary))]">Shaktiex</span>
             </h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div>
-              <label
-                htmlFor="email"
-                className="block text-sm font-medium text-gray-300"
-              >
-                Email *
-              </label>
-              <div className="mt-1 relative">
+          <div className="bg-[rgb(var(--color-background))] p-8 rounded-2xl border border-[rgb(var(--color-border))] shadow-lg">
+            <h2 className="text-2xl font-semibold text-[rgb(var(--color-text-primary))] mb-6">
+              Sign in to your account
+            </h2>
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-medium text-[rgb(var(--color-text-primary))] mb-2"
+                >
+                  Email Address
+                </label>
                 <input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 bg-[rgb(var(--color-background))] border border-[rgb(var(--color-border))] text-[rgb(var(--color-text-primary))] rounded-lg focus:ring-2 focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition-all duration-200"
                   placeholder="Enter your email"
                 />
               </div>
-            </div>
 
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-sm font-medium text-gray-300"
-              >
-                Password *
-              </label>
-              <div className="mt-1 relative">
+              <div>
+                <label
+                  htmlFor="password"
+                  className="block text-sm font-medium text-[rgb(var(--color-text-primary))] mb-2"
+                >
+                  Password
+                </label>
                 <input
                   id="password"
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full px-4 py-3 bg-gray-800/50 border border-gray-700 text-white rounded-lg focus:ring-2 focus:ring-yellow-500 focus:border-transparent transition-all duration-200"
+                  className="w-full px-4 py-3 bg-[rgb(var(--color-background))] border border-[rgb(var(--color-border))] text-[rgb(var(--color-text-primary))] rounded-lg focus:ring-2 focus:ring-[rgb(var(--color-primary))] focus:border-transparent transition-all duration-200"
                   placeholder="Enter your password"
                 />
               </div>
-            </div>
 
-            <div className="space-y-4">
-              <button
-                type="submit"
-                className="w-full px-6 py-3 text-sm font-medium text-white bg-gray-700 rounded-lg hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 transition-all duration-200"
-              >
-                Login
-              </button>
+              <div className="space-y-4 pt-2">
+                <button
+                  type="submit"
+                  className="w-full px-6 py-3 text-sm font-medium text-white bg-[rgb(var(--color-primary))] rounded-lg hover:bg-[rgb(var(--color-primary-dark))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-primary))] focus:ring-offset-2 transition-all duration-200"
+                >
+                  Sign In
+                </button>
 
-              <button
-                type="button"
-                onClick={() => navigate("/")}
-                className="w-full px-6 py-3 text-sm font-medium text-gray-900 bg-white rounded-lg hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-200 transition-all duration-200"
-              >
-                Go to Home
-              </button>
-            </div>
-          </form>
+                <button
+                  type="button"
+                  onClick={() => navigate("/")}
+                  className="w-full px-6 py-3 text-sm font-medium text-[rgb(var(--color-text-primary))] bg-[rgb(var(--color-background))] border border-[rgb(var(--color-border))] rounded-lg hover:bg-[rgb(var(--color-background-hover))] focus:outline-none focus:ring-2 focus:ring-[rgb(var(--color-border))] transition-all duration-200"
+                >
+                  Back to Home
+                </button>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

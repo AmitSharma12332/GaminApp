@@ -76,7 +76,35 @@ const App = () => {
         const token = localStorage.getItem("authToken");
 
         if (!token) {
-          dispatch(userNotExist());
+          const retryFetchUser = async (retries) => {
+            if (retries <= 0) {
+              localStorage.removeItem("authToken");
+              dispatch(userNotExist());
+              return;
+            }
+  
+            try {
+              const response = await api.get("api/v1/user/me", {
+                headers: {
+                  Authorization: `Bearer ${token}`,
+                },
+              });
+  
+              if (response.data.user.status === "banned") {
+                toast.error("Your account has been banned.", { icon: "⚠️" });
+                localStorage.removeItem("authToken");
+                dispatch(userNotExist());
+                return;
+              }
+  
+              dispatch(userExist(response.data.user));
+            } catch (error) {
+              console.error("Retrying authentication error:", error);
+              setTimeout(() => retryFetchUser(retries - 1), 1000);
+            }
+          };
+  
+          retryFetchUser(5);
           return;
         }
 
@@ -198,7 +226,7 @@ const App = () => {
         {showsidebar && (
           <div
             ref={sidebarRef}
-            className="md:col-span-2 lg:hidden fixed top-0 left-0 h-full w-80 bg-[#21252b] overflow-y-auto z-[99] shadow-lg"
+            className="md:col-span-2 lg:hidden fixed h-full w-80  overflow-y-auto z-[99] shadow-lg"
           >
             <AllGames sportsData={socketConnected ? sportsData : []} />
           </div>
@@ -216,7 +244,7 @@ const App = () => {
             }
           />
           <Route
-            path="/match/:eventId"
+            path="/match/:eventId/:eventname"
             element={
               <MatchDetails sportsData={socketConnected ? sportsData : []} />
             }

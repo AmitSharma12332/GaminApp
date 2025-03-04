@@ -103,6 +103,7 @@ const BetSlip = memo(({ match, onClose, setStake, eventId, betPlaced }) => {
     [setStake]
   );
 
+
   const placeBet = useCallback(async () => {
     const token = localStorage.getItem("authToken");
     const currentMatch = matchRef.current;
@@ -132,19 +133,18 @@ const BetSlip = memo(({ match, onClose, setStake, eventId, betPlaced }) => {
       );
 
       if (data.success) {
-        await fetchTransactions();
-        betPlaced();
         toast.success(data.message);
+        await fetchTransactions();
+        setIsPlacingBet(false);
+        betPlaced();
         onClose();
       } else {
-        toast.error(data.message || "Failed to place bet");
+        toast.error(data.message);
       }
     } catch (error) {
       console.error("Bet placement error:", error);
-      toast.error(error.response?.data?.message || "Failed to place bet");
-    } finally {
-      setIsPlacingBet(false);
-    }
+      (error.response?.data?.message);
+    } 
   }, [betAmount, user, onClose, betPlaced, fetchTransactions]);
 
   const currentMatch = matchRef.current;
@@ -154,163 +154,146 @@ const BetSlip = memo(({ match, onClose, setStake, eventId, betPlaced }) => {
   }
 
   return (
-    <div className="lg:bg-[#21252b] bg-[#1a2027] lg:rounded-md rounded-none md:border border-0 border-zinc-700 border-dashed text-white w-full md:p-4 md:pt-2 my-2 mt-2 md:rounded-lg p-4 flex flex-col h-full lg:h-[calc(100vh-64px)]">
-      <div className="flex justify-between items-start">
-        <div>
-          <h2 className="text-lg capitalize max-w-52 mb-2 flex font-bold">
-            {currentMatch
-              ? `${currentMatch.home_team} vs ${currentMatch.away_team}`
-              : "Select a bet"}
-          </h2>
-        </div>
-
-        <div className="text-sm">
-          <h1>Max : {MAX_BET}</h1>
-        </div>
+    <div className="lg:rounded-md rounded-none md:border border-[rgb(var(--color-border))]  bg-[rgb(var(--color-background))] text-[rgb(var(--color-text-primary))] w-full md:p-4 md:pt-2 my-2 mt-2 md:rounded-lg p-4 flex flex-col h-full lg:h-[calc(100vh-64px)]">
+    <div className="flex justify-between items-start">
+      <div>
+        <h2 className="text-lg capitalize max-w-52 mb-2 flex font-bold">
+          {currentMatch ? `${currentMatch.home_team} vs ${currentMatch.away_team}` : "Select a bet"}
+        </h2>
       </div>
 
-      <div className="mb-2 text-sm lg:text-base">
-        <div className="md:p-2 p-0 max-w-full rounded inline-block bg-gray-800">
-          <span
-            className={`font-semibold ${
-              currentMatch?.betType === "Lay" || currentMatch?.betType === "No"
-                ? "text-red-400"
-                : "text-blue-400"
-            }`}
-          >
-            {currentMatch?.selectedTeam}{" "}
-          </span>
-          <span className="text-gray-400">
-            ({currentMatch?.betType} @ {currentMatch?.odds})
-          </span>
-        </div>
+      <div className="text-sm">
+        <h1>Max : {MAX_BET}</h1>
       </div>
+    </div>
 
-      <div className="flex items-center lg:flex-row gap-2 mb-2 md:mb-2">
-        <div className="flex gap-2 items-center">
-          <button
-            onClick={() => handleBetChange(betAmount - 1)}
-            className="bg-blue-500 p-2 rounded-lg disabled:opacity-50"
-            disabled={betAmount <= 0 || isPlacingBet}
-          >
-            <Minus size={20} />
-          </button>
-          <input
-            type="number"
-            value={betAmount}
-            onChange={(e) => handleBetChange(Number(e.target.value))}
-            className="bg-gray-700 text-center w-32 p-2 rounded-lg"
-            min={0}
-            max={MAX_BET}
-            disabled={isPlacingBet}
-          />
-          <button
-            onClick={() => handleBetChange(betAmount + 1)}
-            className="bg-blue-500 p-2 rounded-lg disabled:opacity-50"
-            disabled={betAmount >= MAX_BET || isPlacingBet}
-          >
-            <Plus size={20} />
-          </button>
-        </div>
+    <div className="mb-2 text-sm lg:text-base">
+      <h1 className="p-2 uppercase">{match?.category}</h1>
+      <div className="md:p-2 p-2 max-w-full rounded inline-block bg-[rgb(var(--color-background-hover))]">
+        <span
+          className={`font-semibold ${
+            currentMatch?.betType === "Lay" || currentMatch?.betType === "No"
+              ? "text-red-500"
+              : "text-blue-500"
+          }`}
+        >
+          {currentMatch?.selectedTeam}{" "}
+        </span>
+        <span className="text-[rgb(var(--color-text-muted))]">
+          ({currentMatch?.betType} @ {currentMatch?.odds})
+        </span>
       </div>
+    </div>
 
-      <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 my-3 md:my-2">
-        {quickBets.map((bet) => (
-          <button
-            key={bet.value}
-            onClick={() => handleQuickBet(bet.value)}
-            className={`border border-zinc-500 py-2 px-4 rounded text-center hover:bg-gray-600 ${
-              bet.value > user?.amount || isPlacingBet
-                ? "opacity-50 cursor-not-allowed"
-                : ""
-            }`}
-            disabled={bet.value > user?.amount || isPlacingBet}
-          >
-            {bet.label}
-          </button>
-        ))}
-      </div>
-
-      <div className="flex gap-2">
+    <div className="flex items-center lg:flex-row gap-2 mb-2 md:mb-2">
+      <div className="flex gap-2 items-center">
         <button
-          onClick={() => {
-            betPlaced();
-          
-          }}
-          className="flex-1 border border-red-500 text-red-500 py-2 rounded-lg font-medium transition duration-300 hover:bg-red-500 hover:text-white disabled:opacity-50"
+          onClick={() => handleBetChange(betAmount - 1)}
+          className="bg-[rgb(var(--color-primary))] text-white p-2 rounded-lg disabled:opacity-50 hover:bg-[rgb(var(--color-primary-dark))] transition-colors"
+          disabled={betAmount <= 0 || isPlacingBet}
+        >
+          <Minus size={20} />
+        </button>
+        <input
+          type="number"
+          value={betAmount}
+          onChange={(e) => handleBetChange(Number(e.target.value))}
+          className="bg-[rgb(var(--color-background))] border border-[rgb(var(--color-border))] text-center w-32 p-2 rounded-lg"
+          min={0}
+          max={MAX_BET}
           disabled={isPlacingBet}
-        >
-          Cancel
-        </button>
+        />
         <button
-          onClick={placeBet}
-          className="flex-1 bg-green-500 py-2 px-8 rounded-lg font-medium transition duration-300 hover:bg-green-800 disabled:opacity-50 disabled:cursor-not-allowed"
-          disabled={isPlacingBet || !currentMatch}
+          onClick={() => handleBetChange(betAmount + 1)}
+          className="bg-[rgb(var(--color-primary))] text-white p-2 rounded-lg disabled:opacity-50 hover:bg-[rgb(var(--color-primary-dark))] transition-colors"
+          disabled={betAmount >= MAX_BET || isPlacingBet}
         >
-          {isPlacingBet ? "Placing Bet..." : "Place Bet"}
+          <Plus size={20} />
         </button>
       </div>
+    </div>
 
-      {user && eventId && (
-        <div className="mt-4 flex-1 lg:flex hidden overflow-hidden flex-col">
-          <div className="flex justify-between items-center mb-2">
-            <h1 className="font-semibold underline text-blue-500">
-              Open Bets:
-            </h1>
-            {isLoadingTransactions && (
-              <span className="text-sm text-gray-400">Loading...</span>
-            )}
-          </div>
-          <div className="overflow-y-auto flex-1">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="bg-gray-700">
-                  <th className="p-2 text-xs font-semibold text-gray-300">
-                    Selection
-                  </th>
-                  <th className="p-2 text-xs font-semibold text-gray-300">
-                    Stake
-                  </th>
-                  <th className="p-2 text-xs font-semibold text-gray-300">
-                    Odds
-                  </th>
+    <div className="grid grid-cols-3 lg:grid-cols-4 gap-2 my-3 md:my-2">
+      {quickBets.map((bet) => (
+        <button
+          key={bet.value}
+          onClick={() => handleQuickBet(bet.value)} // Using handleQuickBet
+          className={`border border-[rgb(var(--color-border))] py-2 px-4 rounded text-center hover:bg-[rgb(var(--color-background-hover))] transition-colors ${
+            bet.value > user?.amount || isPlacingBet ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+          disabled={bet.value > user?.amount || isPlacingBet}
+        >
+          {bet.label}
+        </button>
+      ))}
+    </div>
+
+    <div className="flex gap-2">
+      <button
+        onClick={()=>{betPlaced(); onClose();}}
+        className="flex-1 border border-red-500 text-red-500 py-2 rounded-lg font-medium transition duration-300 hover:bg-red-500 hover:text-white disabled:opacity-50"
+        disabled={isPlacingBet}
+      >
+        Cancel
+      </button>
+      <button
+        onClick={placeBet}
+        className="flex-1 bg-green-500 text-white py-2 px-8 rounded-lg font-medium transition duration-300 hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled={isPlacingBet || !currentMatch}
+      >
+        {isPlacingBet ? "Placing Bet..." : "Place Bet"}
+      </button>
+    </div>
+
+    {user && eventId && (
+      <div className="mt-4 flex-1 lg:flex hidden overflow-hidden flex-col">
+        <div className="flex justify-between items-center mb-2">
+          <h1 className="font-semibold underline text-[rgb(var(--color-primary))]">Open Bets:</h1>
+          {isLoadingTransactions && <span className="text-sm text-[rgb(var(--color-text-muted))]">Loading...</span>}
+        </div>
+        <div className="overflow-y-auto flex-1">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-[rgb(var(--color-background-hover))]">
+                <th className="p-2 text-xs font-semibold text-[rgb(var(--color-text-primary))]">Selection</th>
+                <th className="p-2 text-xs font-semibold text-[rgb(var(--color-text-primary))]">Stake</th>
+                <th className="p-2 text-xs font-semibold text-[rgb(var(--color-text-primary))]">Odds</th>
+                {allBets.some((bet) => bet.fancyNumber) && (
+                  <th className="p-2 text-xs font-semibold text-[rgb(var(--color-text-primary))]">Run</th>
+                )}
+              </tr>
+            </thead>
+            <tbody>
+              {allBets.map((bet, index) => (
+                <tr
+                  key={index}
+                  className={`${
+                    bet.type === "back" ? "bg-[rgb(var(--color-back))]" : "bg-[rgb(var(--color-lay))]"
+                  } transition-all duration-200`}
+                >
+                  <td className="p-2 text-xs text-[rgb(var(--color-text-primary))] border-t border-[rgb(var(--color-border))]">
+                    {bet.selection}
+                  </td>
+                  <td className="p-2 text-xs text-[rgb(var(--color-text-primary))] border-t border-[rgb(var(--color-border))]">
+                    {bet.stake.toFixed(2)}
+                  </td>
+                  <td className="p-2 text-xs text-[rgb(var(--color-text-primary))] border-t border-[rgb(var(--color-border))]">
+                    {bet.odds}
+                  </td>
                   {allBets.some((bet) => bet.fancyNumber) && (
-                    <th className="p-2 text-xs font-semibold text-gray-300">
-                      Run
-                    </th>
+                    <td className="p-2 text-xs text-[rgb(var(--color-text-primary))] border-t border-[rgb(var(--color-border))] capitalize">
+                      {bet.fancyNumber || "-"}
+                    </td>
                   )}
                 </tr>
-              </thead>
-              <tbody>
-                {allBets.map((bet, index) => (
-                  <tr
-                    key={index}
-                    className={`${
-                      bet.type === "back" ? "bg-[#68bbff]" : "bg-[#ff6b6f]"
-                    } transition-all duration-200`}
-                  >
-                    <td className="p-2 text-xs text-black border-t border-gray-600">
-                      {bet.selection}
-                    </td>
-                    <td className="p-2 text-xs text-black border-t border-gray-600">
-                      {bet.stake.toFixed(2)}
-                    </td>
-                    <td className="p-2 text-xs text-black border-t border-gray-600">
-                      {bet.odds}
-                    </td>
-                    {allBets.some((bet) => bet.fancyNumber) && (
-                      <td className="p-2 text-xs text-black border-t border-gray-600 capitalize">
-                        {bet.fancyNumber || "-"}
-                      </td>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
-    </div>
+      </div>
+    )}
+
+  </div>
   );
 });
 

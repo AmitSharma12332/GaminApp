@@ -3,7 +3,7 @@ import { lazy, useMemo } from "react";
 
 const GameOdds = lazy(() => import("../GameOdds"));
 
-const Cricket = ({ liveData, onBetSelect }) => {
+const Cricket = ({ liveData, onBetSelect, betPlaced }) => {
   const sortedLiveData = useMemo(() => {
     // Return original data if not valid
     if (!liveData?.[4]?.[4] || !Array.isArray(liveData[4][4])) return liveData;
@@ -32,7 +32,7 @@ const Cricket = ({ liveData, onBetSelect }) => {
 
   return (
     <div className="">
-      <GameOdds liveData={sortedLiveData} onBetSelect={onBetSelect} />
+      <GameOdds betPlaced={betPlaced} liveData={sortedLiveData} onBetSelect={onBetSelect} />
     </div>
   );
 };
