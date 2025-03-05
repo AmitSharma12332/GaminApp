@@ -233,8 +233,9 @@ const App = () => {
           </div>
         }
       >
-        <Navbar showsidebar={showsidebar} toggleSidebar={toggleSidebar} />
-        {showsidebar && (
+{window.location.pathname !== "/login" && (
+          <Navbar showsidebar={showsidebar} toggleSidebar={toggleSidebar} />
+        )}        {showsidebar && (
           <div
             ref={sidebarRef}
             className="md:col-span-2 lg:hidden fixed h-full w-80  overflow-y-auto z-[99] shadow-lg"
