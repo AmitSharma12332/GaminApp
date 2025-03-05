@@ -198,7 +198,7 @@ const CricketScoreDirect = ({ eventId }) => {
       <iframe
         ref={iframeRef}
         title="Cricket Score"
-        className="w-full h-40 p-2 md:h-48  border-none bg-black"
+        className="w-full h-52 p-2 md:h-[210px]  border-none bg-black"
         style={{ 
          
           maxWidth: "100%",

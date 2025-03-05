@@ -165,7 +165,7 @@ const MyBetsComponent = () => {
   }
 
   return (
-    <div className="p-4 lg:pt-20 pt-28 rounded-lg">
+    <div className="p-4 lg:pt-20 pt-24 rounded-lg">
       <div className="flex justify-between lg:flex-row flex-col items-center mb-6">
         <div className="flex flex-wrap justify-center items-center gap-4">
           <div className="relative">

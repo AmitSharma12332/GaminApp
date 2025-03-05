@@ -53,7 +53,7 @@ const UserForm = () => {
     setError(null)
 
     try {
-      const response = await axios.get(`${server}api/v1/user/allusers`, {
+      const response = await axios.get(`${server}api/v1/user/allusers?limit=100`, {
         withCredentials: true,
         headers: {
           Authorization: `Bearer ${token}`,
