@@ -88,8 +88,8 @@ const Dashboard = ({ showsidebar, toggleSidebar, sportsData }) => {
 
   return (
     <>
-      <div className=" px-2 ">
-        <div className="max-w-full grid grid-cols-1 md:grid-cols-12 lg:h-[calc(100vh-48px)]">
+      <div className=" px-2  pt-24 lg:pt-16">
+        <div className="max-w-full grid grid-cols-1 md:grid-cols-12 lg:h-[calc(100vh-68px)]">
           {/* Sidebar */}
           <div className="md:col-span-2 lg:flex hidden  overflow-y-auto">
             <AllGames sportsData={sportsData} />

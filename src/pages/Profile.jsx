@@ -223,7 +223,7 @@ const Profile = () => {
   if (error) return <p className="text-[rgb(var(--color-text-primary))]">Error: {error}</p>
 
   return (
-    <div className="">
+    <div className="lg:pt-16 pt-24">
       <div className="max-w-full mx-auto p-2 lg:h-[calc(100vh-64px)] flex flex-col lg:flex-row">
         {/* Mobile Tabs */}
         <div className="lg:hidden flex mb-4 bg-[rgb(var(--color-background))] rounded-lg overflow-hidden border border-[rgb(var(--color-border))]">

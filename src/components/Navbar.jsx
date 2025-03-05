@@ -165,9 +165,12 @@ const NavbarComponent = ({ toggleSidebar, showsidebar }) => {
   }, [profileDropdownOpen]);
 
   return (
-    <nav className="bg-[rgb(var(--color-primary))] w-full z-[99] shadow-md">
+    <nav className="bg-[rgb(var(--color-primary))] fixed w-full z-[99] shadow-md">
       <div className="max-w-full mx-auto p-2 sm:px-4">
-     
+      <div className="marquee md:hidden flex">
+          
+        </div>
+       
         <div className="flex items-center justify-between h-fit lg:hidden">
           <div className="flex items-center gap-2">
             {showsidebar ? (
@@ -256,8 +259,8 @@ const NavbarComponent = ({ toggleSidebar, showsidebar }) => {
                   to={item.href}
                   className={`flex items-center gap-2 px-2 py-2 rounded-lg transition-colors ${
                     location.pathname === item.href
-                      ? "text-yellow-500 bg-[rgb(var(--color-primary-dark))]"
-                      : "text-gray-100 hover:text-yellow-500 hover:bg-[rgb(var(--color-primary-dark))]"
+                      ? "text-orange-900 bg-orange-200"
+                      : "text-gray-100 hover:text-orange-900 hover:bg-orange-200"
                   }`}
                 >
                   <item.icon className="h-4 w-4" />
@@ -335,14 +338,14 @@ const NavbarComponent = ({ toggleSidebar, showsidebar }) => {
             <Link
               key={item.name}
               to={item.href}
-              className={`flex justify-center gap-1 items-center text-gray-100 py-2 px-2 rounded-lg  transition-colors text-base font-medium ${
+              className={`flex justify-center gap-1 items-center text-gray-100 py-1 px-2 rounded-lg  transition-colors text-xs font-medium ${
                 index === navItems.length - 1 && navItems.length % 2 !== 0
                   ? "col-span-2"
                   : ""
               } ${
                 location.pathname === item.href
-                  ? "text-yellow-500"
-                  : "hover:text-yellow-500"
+                  ? "text-orange-900 bg-orange-200"
+                  : ""
               }`}
             >
               <item.icon className="h-4 w-4" />

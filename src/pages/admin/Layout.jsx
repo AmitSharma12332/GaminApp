@@ -10,7 +10,7 @@ const Layout = ({ children }) => {
       </div>
 
       {/* Right Content - Scrollable */}
-      <div className="lg:ml-64 flex-1 p-6 overflow-auto">
+      <div className="lg:ml-64 lg:pt-20 pt-28 flex-1 p-6 overflow-auto">
         {children}
       </div>
     </div>

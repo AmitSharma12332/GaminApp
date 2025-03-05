@@ -27,7 +27,7 @@ const OddsBox = ({ odds, value, type, onClick, isSelected }) => {
       onClick={onClick}
       className={`${
         isSelected ? selectedColor : bgColor
-      } ${hoverColor} w-full sm:w-12 lg:min-w-[100px] min-w-[70px] md:w-16 h-10 rounded flex flex-col items-center justify-center transition-colors`}
+      } ${hoverColor} sm:w-12 lg:min-w-[100px] min-w-[100px] md:w-16 rounded flex flex-col items-center justify-center transition-colors p-1`}
     >
       <span className="text-[rgb(var(--color-text-primary))] font-semibold text-sm">
         {odds?.toFixed(2)}
@@ -63,9 +63,9 @@ const TeamRow = ({ teamName, backOdds, layOdds, onOddsClick, matchData, stake, s
   const filteredLayOdds = layOdds.filter(([value]) => value > 0).slice(0, 1)
 
   return (
-    <div className="flex flex-wrap gap-2 py-2 px-4 sm:flex-nowrap justify-between items-center border-b border-[rgb(var(--color-border))]">
+    <div className="flex gap-2 py-2 px-4 sm:flex-nowrap justify-between items-center border-b border-[rgb(var(--color-border))]">
       <div className="flex flex-col">
-        <span className="text-[rgb(var(--color-text-primary))] text-sm w-full sm:w-[200px] mb-0 font-semibold sm:mb-0">
+        <span className="text-[rgb(var(--color-text-primary))] text-sm w-20 sm:w-[200px] mb-0 font-semibold sm:mb-0">
           {teamName}
         </span>
         <span className="w-full flex justify-start text-xs items-center sm:w-[200px] mb-0 font-semibold sm:mb-0">
@@ -150,10 +150,11 @@ const TeamRow = ({ teamName, backOdds, layOdds, onOddsClick, matchData, stake, s
           )}
         </span>
       </div>
-      <div className="grid grid-cols-2 sm:flex gap-1 w-full sm:w-auto">
+      <div className="grid grid-cols-2 sm:flex gap-1">
         {filteredBackOdds.map(([odds, value], i) => (
-          <div key={`back-${i}`} className="flex flex-col items-center">
+        
             <OddsBox
+            key={`back-${i}`}
               odds={odds}
               value={value}
               type="Back"
@@ -165,11 +166,12 @@ const TeamRow = ({ teamName, backOdds, layOdds, onOddsClick, matchData, stake, s
                 selectedOdd.odds === odds
               }
             />
-          </div>
+       
         ))}
         {filteredLayOdds.map(([odds, value], i) => (
-          <div key={`lay-${i}`} className="flex flex-col items-center">
+         
             <OddsBox
+            key={`lay-${i}`}
               odds={odds}
               value={value}
               type="Lay"
@@ -181,7 +183,7 @@ const TeamRow = ({ teamName, backOdds, layOdds, onOddsClick, matchData, stake, s
                 selectedOdd.odds === odds
               }
             />
-          </div>
+     
         ))}
       </div>
     </div>

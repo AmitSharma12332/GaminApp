@@ -78,7 +78,7 @@ const OpenBetsMob = ({ eventId, isLoadingTransactions = false }) => {
 
       {/* Sliding Container */}
       <div
-        className={`fixed right-0 top-0 h-full w-[85%] max-w-md z-50
+        className={`fixed right-0 top-0 h-full w-[85%] max-w-md z-[99]
           bg-[rgb(var(--color-background))] shadow-xl
           transform transition-transform duration-300 ease-in-out
           ${isOpen ? "translate-x-0" : "translate-x-full"}`}

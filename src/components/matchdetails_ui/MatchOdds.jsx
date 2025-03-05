@@ -22,7 +22,7 @@ const OddsBox = ({ odds, value, type, onClick, isSelected }) => {
       onClick={onClick}
       className={`${
         isSelected ? selectedColor : bgColor
-      } ${hoverColor} w-full sm:w-12 min-w-[70px] md:w-16 rounded flex flex-col items-center justify-center transition-colors p-1`}
+      } ${hoverColor} sm:w-12 min-w-[50px] md:w-16 rounded flex flex-col items-center justify-center transition-colors p-1`}
     >
       <span className="text-black font-semibold text-sm sm:text-base">{odds}</span>
       <span className="text-black text-[10px] lg:text-xs">{value / 1000}K</span>
@@ -82,9 +82,9 @@ const TeamRow = ({
   }
 
   return (
-    <div className="flex flex-wrap gap-2 border-b px-4 sm:flex-nowrap justify-between items-center py-2 border-[rgb(var(--color-border))]">
+    <div className="flex f gap-2 border-b px-4 sm:flex-nowrap justify-between items-center py-2 border-[rgb(var(--color-border))]">
       <div className="flex flex-col">
-        <span className="text-black text-sm w-full sm:w-[200px] mb-0 font-semibold sm:mb-0">
+        <span className="text-black text-sm w-20 sm:w-[200px] mb-0 font-semibold sm:mb-0">
           {teamName}
         </span>
 
@@ -188,10 +188,11 @@ const TeamRow = ({
           )}
         </span>
       </div>
-      <div className="grid grid-cols-3 sm:flex gap-1 w-full sm:w-auto">
+      <div className="grid grid-cols-4 sm:flex gap-1 w-full sm:w-auto">
         {backOdds.map(([odds, value], i) => (
-          <div key={`back-${i}`} className="flex flex-col items-center">
+     
             <OddsBox
+            key={`back-${i}`}
               odds={odds}
               value={value}
               type="back"
@@ -212,11 +213,12 @@ const TeamRow = ({
                 selectedOdd.odds === odds
               }
             />
-          </div>
+      
         ))}
         {layOdds.map(([odds, value], i) => (
-          <div key={`lay-${i}`} className="flex flex-col items-center">
+       
             <OddsBox
+            key={`lay-${i}`}
               odds={odds}
               value={value}
               type="lay"
@@ -237,7 +239,7 @@ const TeamRow = ({
                 selectedOdd.odds === odds
               }
             />
-          </div>
+       
         ))}
       </div>
     </div>
@@ -458,69 +460,62 @@ const MatchOdds = ({
 
   return (
     <div>
-    <div className="border border-[rgb(var(--color-border))] mb-2 rounded-lg overflow-hidden w-full shadow-sm">
-      <div className="flex flex-wrap sm:flex-nowrap bg-[rgb(var(--color-background))] border-b border-[rgb(var(--color-border))] py-2 justify-between items-center px-4 mb-0">
-        <h2 className="text-[rgb(var(--color-text-primary))] text-lg font-semibold">Match Odds</h2>
-        <div className="flex flex-wrap gap-4 items-center">
-          <div className="flex gap-1 sm:-translate-x-[130px]">
-            <span className="bg-[rgb(var(--color-back))] hover:bg-[rgb(var(--color-back-hover))] text-[rgb(var(--color-text-primary))] px-6 py-1 rounded text-xs sm:text-sm font-medium transition-colors">
-              Back
-            </span>
-            <span className="bg-[rgb(var(--color-lay))] hover:bg-[rgb(var(--color-lay-hover))] text-[rgb(var(--color-text-primary))] px-6 py-1 rounded text-xs sm:text-sm font-medium transition-colors">
-              Lay
-            </span>
+      <div className="border border-[rgb(var(--color-border))] mb-2 rounded-lg overflow-hidden w-full shadow-sm">
+        <div className="flex flex-wrap sm:flex-nowrap bg-[rgb(var(--color-background))] border-b border-[rgb(var(--color-border))] py-2 justify-between items-center px-4 mb-0">
+          <h2 className="text-[rgb(var(--color-text-primary))] text-lg font-semibold">Match Odds</h2>
+          <div className="flex flex-wrap gap-4 items-center">
+            <div className="flex gap-1 sm:-translate-x-[130px]">
+            <span className="text-xs bg-[rgb(var(--back-odd))] sm:text-sm text-center w-[70px] text-[rgb(var(--color-text-primary))] py-1 rounded font-semibold">
+                Back
+              </span>
+              <span className="text-xs sm:text-sm bg-[rgb(var(--lay-odd))] w-[70px] text-center text-[rgb(var(--color-text-primary))] py-1 rounded font-semibold">
+                Lay
+              </span>
+            </div>
           </div>
+        </div>
 
-          {/* <button
-              className="bg-[rgb(var(--color-primary))] px-4 rounded-md py-1 text-white hover:bg-[rgb(var(--color-primary-hover))]"
-              onClick={calculateCashout}
-            >
-              Cash Out
-            </button> */}
+        <div className="bg-[rgb(var(--color-background))]">
+          {runnersWithOdds.map((runner, index) => {
+            const backOdds = (runner.back || []).map((odds) => [odds.price, odds.size]).reverse();
+            const layOdds = (runner.lay || []).map((odds) => [odds.price, odds.size]);
+
+            const displayedBackOdds = window.innerWidth < 640 ? backOdds.slice(1, 3) : backOdds;
+            const displayedLayOdds = window.innerWidth < 640 ? layOdds.slice(1, 3) : layOdds;
+
+            return (
+              <TeamRow
+                key={index}
+                teamName={runner.name}
+                backOdds={displayedBackOdds}
+                layOdds={displayedLayOdds}
+                onOddsClick={handleOddsClick}
+                matchData={matchData}
+                stake={stake}
+                selectedOdd={selectedOdd}
+                selectionId={runner.selectionId}
+                margin={margin}
+              />
+            );
+          })}
         </div>
       </div>
 
-      <div className=" bg-[rgb(var(--color-background))]">
-        {runnersWithOdds.map((runner, index) => {
-          const backOdds = (runner.back || []).map((odds) => [odds.price, odds.size]).reverse()
-          const layOdds = (runner.lay || []).map((odds) => [odds.price, odds.size])
-
-          return (
-            <TeamRow
-              key={index}
-              teamName={runner.name}
-              backOdds={backOdds}
-              layOdds={layOdds}
-              onOddsClick={handleOddsClick}
-              matchData={matchData}
-              stake={stake}
-              selectedOdd={selectedOdd}
-              selectionId={runner.selectionId}
-              margin={margin}
-              // cashoutData={cashoutData}
-
+      {showBetSlip && (
+        <div className="lg:hidden my-4">
+          {selectedBet ? (
+            <BetSlip
+              match={selectedBet}
+              onClose={() => setSelectedBet(null)}
+              setStake={setStake}
+              betPlaced={betPlaced}
             />
-          )
-        })}
-      </div>
+          ) : (
+            <></>
+          )}
+        </div>
+      )}
     </div>
-
-    {showBetSlip && (
-      <div className="lg:hidden my-4">
-        {selectedBet ? (
-          <BetSlip
-            match={selectedBet}
-            onClose={() => setSelectedBet(null)}
-            setStake={setStake}
-            betPlaced={betPlaced}
-          />
-        ) : (
-          <>
-          </>
-        )}
-      </div>
-    )}
-  </div>
   );
 };
 

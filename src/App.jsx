@@ -18,6 +18,17 @@ import {
   userExist,
   userNotExist,
 } from "./redux/reducer/userReducer";
+const AccountsPayouts = lazy(() => import("./pages/legal/AccountsPayouts"));
+const KycPage = lazy(() => import("./pages/legal/KycPage"));
+const PrivacyPolicy = lazy(() => import("./pages/legal/PrivacyPolicy"));
+const SelfExclusion = lazy(() => import("./pages/legal/SelfExclusion"));
+const AmlPolicy = lazy(() => import("./pages/legal/AmlPolicy"));
+const About = lazy(() => import("./pages/About"));
+const ResponsibleGambling = lazy(() => import("./pages/legal/ResponsibleGambling"));
+const TermsConditions = lazy(() => import("./pages/legal/TermsConditions"));
+const DisputeResolution = lazy(() => import("./pages/legal/DisputeResolution"));
+const BettingRules = lazy(() => import("./pages/legal/BettingRules"));
+const FairnessRng = lazy(() => import("./pages/legal/FairnessRng"));
 
 // Lazy loading components for better performance
 const Loader = lazy(() => import("./components/Loader"));
@@ -307,6 +318,18 @@ const App = () => {
 
           {/* 404 Not Found */}
           <Route path="*" element={<NotFound />} />
+          <Route path="/kyc" element={<KycPage />} />
+          <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+          <Route path="/self-exclusion" element={<SelfExclusion />} />
+          <Route path="/aml" element={<AmlPolicy />} />
+          <Route path="/about" element={<About />} />
+          <Route path="/responsible-gambling" element={<ResponsibleGambling />} />
+          <Route path="/terms" element={<TermsConditions />} />
+          <Route path="/betting-rules" element={<BettingRules />} />
+          <Route path="/dispute" element={<DisputeResolution />} />
+          <Route path="/fairness" element={<FairnessRng />} />
+          <Route path="/accounts" element={<AccountsPayouts />} />
+          <Route path="/about" element={<About />} />
         </Routes>
       </Suspense>
       <Toaster position="bottom-center" />
