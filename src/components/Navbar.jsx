@@ -212,7 +212,7 @@ const NavbarComponent = ({ toggleSidebar, showsidebar }) => {
                         </button>
                       </Link>
                       {user?.role === "admin" && (
-                        <Link to="/admin">
+                        <Link to="/admin/usermanagement">
                           <button className="w-full text-left px-3 py-2 text-white text-sm hover:bg-[rgb(var(--color-primary-darker))] transition-colors">
                             Admin Panel
                           </button>
@@ -306,7 +306,7 @@ const NavbarComponent = ({ toggleSidebar, showsidebar }) => {
                         </button>
                       </Link>
                       {user?.role === "admin" && (
-                        <Link to="/admin">
+                        <Link to="/admin/usermanagement">
                           <button className="w-full text-left px-4 py-2 text-white hover:bg-[rgb(var(--color-primary-darker))] transition-colors">
                             Admin Panel
                           </button>

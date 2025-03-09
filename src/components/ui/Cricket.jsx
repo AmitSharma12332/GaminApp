@@ -1,40 +1,27 @@
-/* eslint-disable react/prop-types */
-import { lazy, useMemo } from "react";
+"use client"
 
-const GameOdds = lazy(() => import("../GameOdds"));
+/* eslint-disable react/prop-types */
+import { lazy } from "react"
+
+const GameOdds = lazy(() => import("../GameOdds"))
 
 const Cricket = ({ liveData, onBetSelect, betPlaced }) => {
-  const sortedLiveData = useMemo(() => {
-    // Return original data if not valid
-    if (!liveData?.[4]?.[4] || !Array.isArray(liveData[4][4])) return liveData;
+ 
 
-    try {
-      // Create a deep copy of liveData
-      const newLiveData = JSON.parse(JSON.stringify(liveData));
-
-      // Sort matches array based on event.event.startDate
-      newLiveData[4][4] = newLiveData[4][4].sort((a, b) => {
-        const dateA = a?.event?.event?.startDate
-          ? new Date(a.event.event.startDate).getTime()
-          : 0;
-        const dateB = b?.event?.event?.startDate
-          ? new Date(b.event.event.startDate).getTime()
-          : 0;
-        return dateA - dateB;
-      });
-
-      return newLiveData;
-    } catch (error) {
-      console.error("Error sorting live data:", error);
-      return liveData;
-    }
-  }, [liveData]);
+  if (!liveData || liveData.length === 0) {
+    return (
+      <div className="p-4 text-center">
+        <p className="text-lg">No matches available at the moment</p>
+      </div>
+    )
+  }
 
   return (
     <div className="">
-      <GameOdds betPlaced={betPlaced} liveData={sortedLiveData} onBetSelect={onBetSelect} />
+      <GameOdds betPlaced={betPlaced} liveData={liveData} onBetSelect={onBetSelect} />
     </div>
-  );
-};
+  )
+}
 
-export default Cricket;
+export default Cricket
+

@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 "use client";
 
 /* eslint-disable react/prop-types */
@@ -10,7 +11,7 @@ import Loader from "../components/Loader";
 import Bookmaker from "../components/matchdetails_ui/Bookmaker";
 import CricketScore from "../components/matchdetails_ui/CircketScore";
 import MatchOdds from "../components/matchdetails_ui/MatchOdds";
-import Market from "../components/matchdetails_ui/Market"; // Import Market component
+import Market from "../components/matchdetails_ui/Market"; 
 import { server } from "../constants/config";
 import OpenBetsMob from "../components/OpenBetsMob";
 
@@ -63,6 +64,7 @@ const MatchDetails = ({ sportsData }) => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { eventId } = useParams();
+  const { sportId } = useParams();
   const [selectedBet, setSelectedBet] = useState(null);
   const [marginAgain, setMarginAgain] = useState(false);
   const [stake, setStake] = useState(100);
@@ -77,13 +79,14 @@ const MatchDetails = ({ sportsData }) => {
     const fetchData = async () => {
       try {
         const response = await axios.get(
-          `${server}api/v1/getMarkets?eventId=${eventId}`
+          `${server}api/v1/getMarkets?eventId=${eventId}&sportId=${sportId}`
         );
 
         if (response.status !== 200) {
           throw new Error(`Error: ${response.status} - ${response.statusText}`);
         }
         setData(response.data);
+        console.log(response.data);
       } catch (err) {
         console.error("Fetch error:", err);
         setError(
@@ -100,7 +103,7 @@ const MatchDetails = ({ sportsData }) => {
     const intervalId = setInterval(fetchData, 1000);
 
     return () => clearInterval(intervalId);
-  }, [eventId]);
+  }, [eventId, sportId]);
 
   const categorizedData = useMemo(() => {
     if (!data) return null;
@@ -152,7 +155,7 @@ const MatchDetails = ({ sportsData }) => {
         });
       }
       return Object.fromEntries(
-        Object.entries(categories).filter(([value]) => value.length > 0)
+        Object.entries(categories).filter(([key, value]) => value.length > 0)
       );
     };
 
@@ -190,7 +193,7 @@ const MatchDetails = ({ sportsData }) => {
     }
 
     const ActiveComponent = tabComponents[activeTab];
-    if (!ActiveComponent) return null;
+    if (!ActiveComponent || !categorizedData[activeTab]?.length) return null;
 
     return (
       <ActiveComponent
@@ -256,8 +259,7 @@ const MatchDetails = ({ sportsData }) => {
           </div>
 
           <CricketScore eventId={eventId} />
-          <OpenBetsMob eventId={eventId} marginAgain={marginAgain}
- />
+          <OpenBetsMob eventId={eventId} marginAgain={marginAgain} />
 
           <MatchOdds
             stake={stake}

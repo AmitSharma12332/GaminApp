@@ -6,6 +6,7 @@ import { Ban, ChevronLeft, ChevronRight, Mail, Plus, Search, Shield, UserCircle,
 import { useCallback, useEffect, useState } from "react"
 import toast from "react-hot-toast"
 import { server } from "../../constants/config"
+import { Link } from "react-router-dom"
 
 const UserForm = () => {
   const [users, setUsers] = useState([])
@@ -317,6 +318,14 @@ const UserForm = () => {
                         <Plus className="h-4 w-4" />
                         Add Money
                       </button>
+
+                      <Link to={`/admin/user/${user._id}`} className="px-3 py-1 bg-[rgb(var(--color-primary))] text-white rounded-lg hover:bg-[rgb(var(--color-primary-dark))] flex items-center gap-1">
+                      <button>
+                       Withdrawl Request
+                      </button>
+                      </Link>
+
+
                     </div>
                   </td>
                 </tr>

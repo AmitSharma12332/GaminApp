@@ -5,13 +5,9 @@ import { Link } from "react-router-dom";
 const BetSlip = lazy(() => import("./BetSlip"));
 
 const GameOdds = ({ liveData, onBetSelect,betPlaced }) => {
+  // console.log(liveData);
   const [selectedBet, setSelectedBet] = useState(null);
   // Access the correct data structure
-  const games = liveData?.[4]?.[4] || [];
-
-  const sortedGames = games.sort((a, b) => {
-    return (b.odds?.[0]?.inplay ? 1 : 0) - (a.odds?.[0]?.inplay ? 1 : 0);
-  });
 
   const handleOddsClick = (game, team, type, odds) => {
     const betData = {
@@ -110,8 +106,8 @@ const GameOdds = ({ liveData, onBetSelect,betPlaced }) => {
   return (
     <div className="pt-2">
       <div className="flex gap-2 flex-col">
-        {sortedGames && sortedGames?.length > 0 ? (
-          sortedGames.map((game, index) => {
+        {liveData && liveData?.length > 0 ? (
+          liveData.map((game, index) => {
             const arrangedRunners = arrangeRunners(
               game.event?.runners,
               game.odds?.[0]?.runners
@@ -141,7 +137,7 @@ const GameOdds = ({ liveData, onBetSelect,betPlaced }) => {
                       </span>
                     </div>
                     <Link
-                      to={`/match/${game.event?.event?.id}/${encodeURIComponent(game.event?.event?.name)}`}
+                      to={`/match/${game?.event?.sport?.id}/${game.event?.event?.id}/${encodeURIComponent(game.event?.event?.name)}`}
                       className="block  hover:text-[rgb(var(--color-primary))] transition-colors"
                     >
                       <div className="flex justify-between items-center mt-2">

@@ -18,6 +18,7 @@ import {
   userExist,
   userNotExist,
 } from "./redux/reducer/userReducer";
+import Withdrawl from "./pages/admin/Withdrawl";
 const AccountsPayouts = lazy(() => import("./pages/legal/AccountsPayouts"));
 const KycPage = lazy(() => import("./pages/legal/KycPage"));
 const PrivacyPolicy = lazy(() => import("./pages/legal/PrivacyPolicy"));
@@ -108,7 +109,7 @@ const App = () => {
                 return;
               }
   
-              dispatch(userExist(response.data.user));
+             
             } catch (error) {
               console.error("Retrying authentication error:", error);
               setTimeout(() => retryFetchUser(retries - 1), 1000);
@@ -257,7 +258,7 @@ const App = () => {
             }
           />
           <Route
-            path="/match/:eventId/:eventname"
+            path="/match/:sportId/:eventId/:eventname"
             element={
               <MatchDetails sportsData={socketConnected ? sportsData : []} />
             }
@@ -306,6 +307,7 @@ const App = () => {
               >
                 <Layout>
                   <Routes>
+                    <Route path="/user/:userId" element={<Withdrawl />} />
                     <Route path="/requests" element={<Allrequests />} />
                     <Route
                       path="/usermanagement"

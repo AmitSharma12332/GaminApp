@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Link } from "react-router-dom"
 
 const menuItems = [
-  { id: "dashboard", icon: "📊", label: "Dashboard", href: "/admin" },
+
   { id: "users", icon: "👥", label: "Users", href: "/admin/usermanagement" },
   { id: "requests", icon: "🛍️", label: "All Bets", href: "/admin/requests" },
   { id: "settings", icon: "⚙️", label: "Settings", href: "/admin/management" },
